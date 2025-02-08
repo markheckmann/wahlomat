@@ -13,72 +13,74 @@ library(tidyverse)
 library(OpenRepGrid)
 library(janitor)
 library(openxlsx)
+library(flextable)
 
+file_in <- "data/wide_format.xlsx"
 grid_file <- "data/grid.xlsx"
 ```
 
 ```{r echo=FALSE}
 g <- importExcel(grid_file)
-themen <- rightpoles(g)
-rightpoles(g) <- paste("↑", themen)
-leftpoles(g) <- paste(themen, "↓")
+thesen <- rightpoles(g)
+rightpoles(g) <- paste("↑", thesen)
+leftpoles(g) <- paste(thesen, "↓")
 
 parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
 ga <- g[, parteien_auswahl]
-
 ```
 
 ## Heatmap der Antworten 
 
-Nachfolgende Grafiken sind eine Darstellung der Positionen verschiedener Parteien zu politischen Themen, wobei Zustimmung und Ablehnung durch Farben (grün/rot) dargestellt werden.  Sie ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen Themen. Sie zeigt, welche Parteien inhaltlich nah beieinander liegen und welche Unterschiede aufweisen.
+Nachfolgende Grafiken sind eine Darstellung der Positionen verschiedener Parteien zu politischen Thesen, wobei Zustimmung und Ablehnung durch Farben (grün/rot) dargestellt werden.  Sie ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen Thesen. Sie zeigt, welche Parteien inhaltlich nah beieinander liegen und welche Unterschiede aufweisen.
 
 Hier ist eine kurze Lesehilfe und Interpretation:
 
 **Lesehilfe**
 
 - *Spalten (Parteien)*: Jede Spalte repräsentiert eine Partei oder Gruppierung (z. B. SPD, CDU/CSU, AfD).
-- *Zeilen (Themen)*: Jede Zeile steht für ein politisches Thema, z. B. "Tempolimit auf Autobahnen" oder "Erhöhung des Mindestlohns".
+- *Zeilen (Thesen)*: Jede Zeile steht für eine politische These, z. B. "Tempolimit auf Autobahnen" oder "Erhöhung des Mindestlohns".
 - Farben:
-  - *Grün*: Die Partei unterstützt dieses Thema.
-  - *Rot*: Die Partei lehnt dieses Thema ab.
+  - *Grün*: Die Partei unterstützt diese These.
+  - *Rot*: Die Partei lehnt diese These ab.
   - *Neutral* (keine Farbe): neutrale Position.
 
 
-```{r echo=FALSE, fig.width = 9, fig.height=9}
-bertinCluster(ga, align = FALSE, 
-              colors = c("red", "green"), 
-              showvalues = FALSE, 
-              xsegs = c(0, 0.3, 0.6, 0.9, 1), 
-              ysegs = c(0, 0.1, 0.825, 1))
+```{r include=FALSE, echo=FALSE, fig.width = 9, fig.height=9}
+bertinCluster(ga,
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  xsegs = c(0, 0.3, 0.6, 0.9, 1),
+  ysegs = c(0, 0.1, 0.825, 1)
+)
 ```
 
 ```{r echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
 # weitere Variante
 ga_2d <- reorder2d(ga)
-e_ii <- 1:11 #c(8:11, 1:7)
+e_ii <- 1:11 # c(8:11, 1:7)
 e_ii <- rev(c(2:1, 11:3)) # rotieren links - rechts
 bertin(ga_2d[, e_ii],
   align = FALSE,
   colors = c("red", "green"),
-  showvalues = FALSE, 
-  xlim = c(.3, .7), 
+  showvalues = FALSE,
+  xlim = c(.3, .7),
   ylim = c(0, .8)
 )
-
 ```
 
 
 ## Räumliche Darstellung
 
-Die Darstellung unten ist ein *Biplot*. Dies ist eine Variante des Streudiagramms jedoch mit mehr als zwei Achsen. Es ermöglicht sowohl die Beziehungen zwischen den Themen als auch zwischen den Parteien in einem Bild darzustellen. So interpretiert man die Grafik:
+Die Darstellung unten ist ein *Biplot*. Dies ist eine Variante des Streudiagramms jedoch mit mehr als zwei Achsen. Es ermöglicht sowohl die Beziehungen zwischen den Thesen als auch zwischen den Parteien in einem Bild darzustellen. So interpretiert man die Grafik:
 
 *Punkte (Parteien)*
 
-Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen, wie sie in Bezug auf die dargestellten Themen geantwortet haben. Parteien, die nah beieinander sind, haben tendenziell ähnlich geantwortet.
+Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen, wie sie in Bezug auf die dargestellten Thesen geantwortet haben. Parteien, die nah beieinander sind, haben tendenziell ähnlich geantwortet.
 
-*Achsen (Themen)*
+*Achsen (Thesen)*
 
-Die Achsen repräsentiere die Themen. Themen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist.
+Die Achsen repräsentiere die Thesen. Thesen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist.
 Wenn ,an das Lot vom einer Partei auf eien Achse fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend war. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
 
 
@@ -87,3 +89,12 @@ biplot2d(ga, center = 0, mai = c(1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.labe
 # biplot3d(ga)
 ```
 
+
+```{r echo=FALSE}
+df <- read_excel(file_in)
+df |>
+  select(these_titel:these_these) |>
+  arrange(these_titel) |> 
+  flextable(cwidth = c(2,5)) |> 
+  set_header_labels(values = c("Kurzform", "These")) 
+```
