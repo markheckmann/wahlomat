@@ -39,13 +39,14 @@ Nachfolgende Grafik ist eine Darstellung der Position der Parteien zu den 38 im 
 
 - *Spalten (Parteien)*: Jede Spalte repräsentiert eine Partei (z. B. SPD, CDU/CSU, AfD).
 - *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen" oder "Erhöhung des Mindestlohns". Die ausführliche Formulierung der These finden Sie in der Tabelle weiter unten.
-- Farben:
+- *Farben*:
   - *Grün*: Die Partei unterstützt die These.
   - *Rot*: Die Partei lehnt die These ab.
   - *Neutral* (dunkle Farbe): neutrale Position.
 
 
 ```{r include=FALSE, echo=FALSE, fig.width = 9, fig.height=9}
+# nicht genutzt
 bertinCluster(ga,
   align = FALSE,
   colors = c("red", "green"),
@@ -55,11 +56,9 @@ bertinCluster(ga,
 )
 ```
 
-```{r echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
-# weitere Variante
+```{r img-heatmap, echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
 ga_2d <- reorder2d(ga)
-e_ii <- 1:11 # c(8:11, 1:7)
-e_ii <- rev(c(2:1, 11:3)) # rotieren links - rechts
+e_ii <- c(3:11, 1:2) # rotieren links - rechts
 bertin(ga_2d[, e_ii],
   align = FALSE,
   colors = c("red", "green"),
@@ -82,7 +81,7 @@ Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen
 
 Die Achsen repräsentieren die politischen Thesen. Thesen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist. Wenn man das Lot von einer Partei (der Punkt) auf eine Achse (These) fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend war. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
 
-```{r echo=FALSE, fig.width = 7, fig.height=7}
+```{r img-biplot, echo=FALSE, fig.width = 7, fig.height=7}
 biplot2d(ga, center = 0, mai = c(1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.label.col = "blue")
 # biplot3d(ga)
 ```
@@ -92,15 +91,15 @@ biplot2d(ga, center = 0, mai = c(1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.labe
 
 Die Thesen sind zur schnelleren Auffindbarkeit alphabetisch nach ihrer Kurzform geordet.
 
-```{r echo=FALSE}
+```{r tbl-thesen, echo=FALSE}
 df <- read_excel(file_in)
 thesen_ordered <- stri_sort(df$these_titel, locale = "de_DE")
 de_order <- match(df$these_titel, thesen_ordered)
 df |>
   select(these_titel:these_these) |>
-  arrange(de_order) |> 
-  flextable(cwidth = c(2,5)) |> 
-  set_header_labels(values = c("Kurzform", "These")) 
+  arrange(de_order) |>
+  flextable(cwidth = c(3, 6)) |>
+  set_header_labels(values = c("Kurzform", "These"))
 ```
 
 ## Daten und Methodik
