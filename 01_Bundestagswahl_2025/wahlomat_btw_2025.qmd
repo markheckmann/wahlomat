@@ -1,11 +1,13 @@
 ---
 title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
 format: 
+  gfm:
+    keep-md: true
   html:
     self-contained: true
     toc: true
 execute:
-  keep-md: true
+  freeze: auto  # Ensures execution results are cached
 ---
 
 ```{r include=FALSE}
@@ -110,8 +112,9 @@ de_order <- match(df$these_kurzform_cleaned, thesen_ordered)
 df |>
   select(c(these_kurzform, these_these)) |>
   arrange(de_order) |>
-  flextable(cwidth = c(3, 6)) |>
-  set_header_labels(values = c("These (Kurzform)", "These"))
+  knitr::kable()
+  # flextable(cwidth = c(3, 6)) |>
+  # set_header_labels(values = c("These (Kurzform)", "These"))
 ```
 
 ## Daten und Methodik
