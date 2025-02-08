@@ -3,9 +3,6 @@ title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
 format: 
   gfm:
     keep-md: true
-  html:
-    self-contained: true
-    toc: true
 execute:
   freeze: auto  # Ensures execution results are cached
 ---
@@ -16,7 +13,6 @@ execute:
 ::: {.cell}
 
 :::
-
 
 
 
@@ -41,13 +37,11 @@ Nachfolgende Grafik (Heatmap) zeigt die Haltung der Parteien zu den 38 im Wahl-O
 
 
 
-
 ::: {.cell}
 ::: {.cell-output-display}
 ![](wahlomat_btw_2025_files/figure-commonmark/img-heatmap-1.png){width=800 height=800}
 :::
 :::
-
 
 
 
@@ -68,13 +62,11 @@ Die Achsen repräsentieren die politischen Thesen. Thesen weisen in eine ähnlic
 
 
 
-
 ::: {.cell}
 ::: {.cell-output-display}
 ![](wahlomat_btw_2025_files/figure-commonmark/img-biplot-1.png)
 :::
 :::
-
 
 
 
@@ -84,12 +76,11 @@ Die im Wahl-O-Mat verwendeten Thesen sind in nachfolgender Tabelle aufgelistet. 
 
 
 
-
 ::: {#tbl-thesen .cell}
 ::: {.cell-output-display}
 
 
-|these_kurzform                                    |these_these                                                                                                                       |
+|Kurzform                                          |These                                                                                                                             |
 |:-------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------|
 |35-Stunden-Woche gesetzlich einführen             |In Deutschland soll die 35-Stunden-Woche als gesetzliche Regelarbeitszeit für alle Beschäftigten festgelegt werden.               |
 |Arbeitserlaubnis für Asylsuchende sofort          |Asylsuchende sollen in Deutschland sofort nach ihrer Antragstellung eine Arbeitserlaubnis erhalten.                               |
@@ -133,7 +124,6 @@ Die im Wahl-O-Mat verwendeten Thesen sind in nachfolgender Tabelle aufgelistet. 
 
 :::
 :::
-
 
 
 

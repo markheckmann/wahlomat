@@ -3,9 +3,6 @@ title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
 format: 
   gfm:
     keep-md: true
-  html:
-    self-contained: true
-    toc: true
 execute:
   freeze: auto  # Ensures execution results are cached
 ---
@@ -110,7 +107,7 @@ df <- df |> mutate(these_kurzform_cleaned = str_remove_all(these_kurzform, "„"
 thesen_ordered <- stri_sort(df$these_kurzform_cleaned, locale = "de_DE")
 de_order <- match(df$these_kurzform_cleaned, thesen_ordered)
 df |>
-  select(c(these_kurzform, these_these)) |>
+  select(c(Kurzform = these_kurzform, These = these_these)) |>
   arrange(de_order) |>
   knitr::kable()
   # flextable(cwidth = c(3, 6)) |>

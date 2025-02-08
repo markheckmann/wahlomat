@@ -75,7 +75,7 @@ aufgelistet. Zur schnelleren Auffindbarkeit ist die Tabelle alphabetisch
 nach der in den Grafiken genutzten Thesen-Kurzform (von uns erstellt)
 geordnet.
 
-| these_kurzform | these_these |
+| Kurzform | These |
 |:---|:---|
 | 35-Stunden-Woche gesetzlich einführen | In Deutschland soll die 35-Stunden-Woche als gesetzliche Regelarbeitszeit für alle Beschäftigten festgelegt werden. |
 | Arbeitserlaubnis für Asylsuchende sofort | Asylsuchende sollen in Deutschland sofort nach ihrer Antragstellung eine Arbeitserlaubnis erhalten. |
