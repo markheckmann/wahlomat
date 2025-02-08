@@ -1,8 +1,7 @@
 ---
 title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
 format: 
-  gfm:
-    keep-md: true
+  gfm
 execute:
   freeze: auto
   fig-dpi: 300
