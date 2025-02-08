@@ -1,0 +1,58 @@
+---
+title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
+format: 
+  html:
+    self-contained: true
+execute:
+  keep-md: true
+---
+
+```{r include=FALSE}
+library(readxl)
+library(tidyverse)
+library(OpenRepGrid)
+library(janitor)
+library(openxlsx)
+
+grid_file <- "data/grid.xlsx"
+```
+
+```{r echo=FALSE}
+g <- importExcel(grid_file)
+themen <- rightpoles(g)
+rightpoles(g) <- paste("↑", themen)
+leftpoles(g) <- paste(themen, "↓")
+
+parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
+ga <- g[, parteien_auswahl]
+
+```
+
+```{r echo=FALSE, fig.width = 9, fig.height=9}
+bertinCluster(ga, align = FALSE, 
+              colors = c("red", "green"), 
+              showvalues = FALSE, 
+              xsegs = c(0, 0.3, 0.6, 0.9, 1), 
+              ysegs = c(0, 0.1, 0.825, 1))
+```
+
+```{r echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
+# weitere Variante
+ga_2d <- reorder2d(ga)
+e_ii <- 1:11 #c(8:11, 1:7)
+e_ii <- rev(c(2:1, 11:3)) # rotieren links - rechts
+bertin(ga_2d[, e_ii],
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE, 
+  xlim = c(.3, .7), 
+  ylim = c(0, .8)
+)
+
+```
+
+```{r echo=FALSE, fig.width = 7, fig.height=7}
+biplot2d(ga, mai = c(.1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.label.col = "blue")
+# biplot3d(ga)
+```
+
