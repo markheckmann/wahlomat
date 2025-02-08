@@ -3,6 +3,7 @@ title: "Parteien und Thesen des 'Wahl-O-Mat' 2025"
 format: 
   html:
     self-contained: true
+    toc: true
 execute:
   keep-md: true
 ---
@@ -10,10 +11,11 @@ execute:
 ```{r include=FALSE}
 library(readxl)
 library(tidyverse)
-library(OpenRepGrid)
+library(stringi)
 library(janitor)
 library(openxlsx)
 library(flextable)
+library(OpenRepGrid)
 
 file_in <- "data/wide_format.xlsx"
 grid_file <- "data/grid.xlsx"
@@ -86,11 +88,21 @@ biplot2d(ga, center = 0, mai = c(1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.labe
 ```
 
 
+## Die politischen Thesen
+
+Die Thesen sind zur schnelleren Auffindbarkeit alphabetisch nach ihrer Kurzform geordet.
+
 ```{r echo=FALSE}
 df <- read_excel(file_in)
+thesen_ordered <- stri_sort(df$these_titel, locale = "de_DE")
+de_order <- match(df$these_titel, thesen_ordered)
 df |>
   select(these_titel:these_these) |>
-  arrange(these_titel) |> 
+  arrange(de_order) |> 
   flextable(cwidth = c(2,5)) |> 
   set_header_labels(values = c("Kurzform", "These")) 
 ```
+
+## Daten und Methodik
+
+TBD
