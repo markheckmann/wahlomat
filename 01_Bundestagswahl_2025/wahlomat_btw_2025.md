@@ -9,15 +9,15 @@ Parteienpositionen visuell dargestellt.
 
 ## Antworten zu den Thesen
 
-Nachfolgende Grafik (Heatmap) zeigt die Haltung der Parteien zu den 38
-im Wahl-O-Mat verwendeten politischen Thesen. Zustimmung und Ablehnung
-wird durch Farben (grün/rot) dargestellt. Dies ermöglicht einen
-schnellen Vergleich der Parteipositionen zu verschiedenen Thesen. Die
-Spalten sind so sortiert, dass Parteien mit ähnlichen Antworten
-nebeneinander stehen. Man kann so schnell erkennen, welche Parteien
-inhaltlich nah beieinander liegen. Die Zeilen sind ebenfalls so
-sortiert, dass Thesen bei denen die Parteien insgesamt ähnlich
-geantwortet haben untereinander stehen.
+Nachfolgende Grafik (Heatmap) zeigt die Haltung *ausgewählter* Parteien
+(aus Gründen der Übersichtlichkeit) zu den 38 im Wahl-O-Mat verwendeten
+politischen Thesen. Zustimmung und Ablehnung wird durch Farben
+(grün/rot) dargestellt. Dies ermöglicht einen schnellen Vergleich der
+Parteipositionen zu verschiedenen Thesen. Die Spalten sind so sortiert,
+dass Parteien mit ähnlichen Antworten nebeneinander stehen. Man kann so
+schnell erkennen, welche Parteien inhaltlich nah beieinander liegen. Die
+Zeilen sind ebenfalls so sortiert, dass Thesen bei denen die Parteien
+insgesamt ähnlich geantwortet haben untereinander stehen.
 
 **Lesehilfe**
 
