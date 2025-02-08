@@ -4,7 +4,8 @@ format:
   gfm:
     keep-md: true
 execute:
-  freeze: auto  # Ensures execution results are cached
+  freeze: auto
+  fig-dpi: 300
 ---
 
 
