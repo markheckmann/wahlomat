@@ -4,12 +4,25 @@ library(OpenRepGrid)
 library(janitor)
 library(openxlsx)
 
-file_in <- "01_Bundestagswahl_2025/data/Wahl-O-Mat Bundestagswahl 2025_Datensatz_v1.01.xlsx"
-file_out <- "01_Bundestagswahl_2025/data/wide_format.xlsx"
+
+# settings -----
+
+data_folder <- "01_Bundestagswahl_2025/data"
+
+file_in <- file.path(data_folder, "Wahl-O-Mat Bundestagswahl 2025_Datensatz_v1.01.xlsx")
+file_out <- file.path(data_folder, "wide_format.xlsx")
+file_out_grid <- file.path(data_folder, "grid.xlsx")
+
+# prepare -----
 
 x <- read_excel(file_in, "Datensatz BTW 2025") |> clean_names()
+kf <- read_excel(file_in, "Kurzform") |>
+  clean_names() |>
+  select(these_nr, these_kurzform)
 
-x <- x |> mutate(
+x2 <- x |> left_join(kf, by = join_by(these_nr))
+
+x2 <- x2 |> mutate(
   position_num = case_match(
     position_position,
     "stimme nicht zu" ~ -1,
@@ -22,30 +35,17 @@ x <- x |> mutate(
   )
 )
 
-df <- x |> pivot_wider(
-  id_cols = c(these_nr, these_titel, these_these),
+df <- x2 |> pivot_wider(
+  id_cols = c(these_nr, these_titel, these_kurzform, these_these),
   names_from = partei_kuerzel, values_from = position_num
 )
 
+df_grid <- df |>
+  mutate(`-1` = NA) |>  # linke leere Spalte für Grid Daten
+  select(`-1`, SPD:WerteUnion, `1` = these_kurzform)
+
+
+# save ----
 
 write.xlsx(df, file_out)
-
-#
-# g <- importExcel("data/wide_format.xlsx")
-# themen <- rightpoles(g)
-# rightpoles(g) <- paste("↑", themen)
-# leftpoles(g) <- paste(themen, "↓")
-#
-# parteien_auswahl <- c(1,2,3,4,5,6,8,14,25,28,26)
-# ga <- g[, parteien_auswahl]
-# bertinCluster(ga, align = F,
-#               colors = c("red", "green"),
-#               showvalues = F)
-# biplot2d(ga, mai =c(1,1,1,1))
-# gaa <- OpenRepGrid::reorder2d(ga)
-# e_ii <- c(8:11, 1:7)
-# bertin(gaa[, e_ii], align = F,
-#               colors = c("red", "green"),
-#               showvalues = F)
-#
-# biplot3d(g)
+write.xlsx(df_grid, file_out_grid)

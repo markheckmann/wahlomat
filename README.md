@@ -1,11 +1,6 @@
 ---
-title: "README"
+title: "Visualisierung Wahl-O-Mat"
 output: html_document
 ---
 
-Visualisierung der Parteipositionen
-
-
-*Quelle des Datensätze*
-
-- BTW 2025: <https://www.bpb.de/themen/wahl-o-mat/bundestagswahl-2025/558463/download/>
+Visuelle Aufarbeitung der politischen Thesen und zugehörigen Parteipositionen aus dem [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) der [Bundeszentrale für Politische Bildung](https://www.bpb.de/) (BPB) für die Bundestagswahl 2025.
