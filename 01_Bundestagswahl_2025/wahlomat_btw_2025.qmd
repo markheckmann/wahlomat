@@ -29,20 +29,18 @@ parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
 ga <- g[, parteien_auswahl]
 ```
 
-## Heatmap der Antworten 
+## Antworten zu den Thesen 
 
-Nachfolgende Grafiken sind eine Darstellung der Positionen verschiedener Parteien zu politischen Thesen, wobei Zustimmung und Ablehnung durch Farben (grün/rot) dargestellt werden.  Sie ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen Thesen. Sie zeigt, welche Parteien inhaltlich nah beieinander liegen und welche Unterschiede aufweisen.
-
-Hier ist eine kurze Lesehilfe und Interpretation:
+Nachfolgende Grafik ist eine Darstellung der Position der Parteien zu den 38 im Wahl-O-Mat anfgefragten politischen Thesen, wobei Zustimmung und Ablehnung durch Farben (grün/rot) dargestellt werden. Sie ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen Thesen. Sie zeigt, welche Parteien inhaltlich nah beieinander liegen und welche Unterschiede aufweisen. Die Spalten sind so sortiert, dass Parteien mit ählichen Antworten nebeneinander stehen. Die Zeilen sind so sortiert, dass Thesen bei denen die Parteien ähnlich geantwortet haben untereinander stehen.
 
 **Lesehilfe**
 
-- *Spalten (Parteien)*: Jede Spalte repräsentiert eine Partei oder Gruppierung (z. B. SPD, CDU/CSU, AfD).
-- *Zeilen (Thesen)*: Jede Zeile steht für eine politische These, z. B. "Tempolimit auf Autobahnen" oder "Erhöhung des Mindestlohns".
+- *Spalten (Parteien)*: Jede Spalte repräsentiert eine Partei (z. B. SPD, CDU/CSU, AfD).
+- *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen" oder "Erhöhung des Mindestlohns". Die ausführliche Formulierung der These finden Sie in der Tabelle weiter unten.
 - Farben:
-  - *Grün*: Die Partei unterstützt diese These.
-  - *Rot*: Die Partei lehnt diese These ab.
-  - *Neutral* (keine Farbe): neutrale Position.
+  - *Grün*: Die Partei unterstützt die These.
+  - *Rot*: Die Partei lehnt die These ab.
+  - *Neutral* (dunkle Farbe): neutrale Position.
 
 
 ```{r include=FALSE, echo=FALSE, fig.width = 9, fig.height=9}
@@ -72,17 +70,15 @@ bertin(ga_2d[, e_ii],
 
 ## Räumliche Darstellung
 
-Die Darstellung unten ist ein *Biplot*. Dies ist eine Variante des Streudiagramms jedoch mit mehr als zwei Achsen. Es ermöglicht sowohl die Beziehungen zwischen den Thesen als auch zwischen den Parteien in einem Bild darzustellen. So interpretiert man die Grafik:
+Die Darstellung unten ist ein *Biplot*. Dies ist eine Variante des Streudiagramms jedoch mit mehr als zwei Achsen. Er ermöglicht sowohl die Beziehungen zwischen den Thesen als auch zwischen den Parteien in einem Bild darzustellen. So interpretiert man die Grafik:
 
 *Punkte (Parteien)*
 
-Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen, wie sie in Bezug auf die dargestellten Thesen geantwortet haben. Parteien, die nah beieinander sind, haben tendenziell ähnlich geantwortet.
+Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen, wie sie in Bezug auf die dargestellten Thesen geantwortet haben. Weiterhin haben Parteien, die nah beieinander sind, tendenziell ähnlich geantwortet.
 
 *Achsen (Thesen)*
 
-Die Achsen repräsentiere die Thesen. Thesen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist.
-Wenn ,an das Lot vom einer Partei auf eien Achse fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend war. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
-
+Die Achsen repräsentieren die politischen Thesen. Thesen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist. Wenn man das Lot von einer Partei (der Punkt) auf eine Achse (These) fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend war. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
 
 ```{r echo=FALSE, fig.width = 7, fig.height=7}
 biplot2d(ga, center = 0, mai = c(1, 2, 1, 2), flipaxes = c(FALSE, FALSE), c.label.col = "blue")
