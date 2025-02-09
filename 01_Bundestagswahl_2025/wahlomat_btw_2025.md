@@ -68,6 +68,17 @@ Achsen/Thesen nicht 100% genau abbildet.
 
 ![](wahlomat_btw_2025_files/figure-commonmark/img-biplot-1.png)
 
+## Alle Parteien
+
+Die nachfolgend Darstellung zeigt alle Parteien und Thesen. Die Zeilen
+(Thesen) und Spalten (Parteien) sind nach Ähnlichkeit gruppiert. Die
+baumartigen Strukturen unten und rechts (sog. Dendrogramme) zeigen an,
+wie stark sich die Parteien oder Thesen ähnlich sind.
+
+<img
+src="wahlomat_btw_2025_files/figure-commonmark/img-heatmap-alle-1.png"
+width="800" height="800" />
+
 ## Die politischen Thesen
 
 Die im Wahl-O-Mat verwendeten Thesen sind in nachfolgender Tabelle

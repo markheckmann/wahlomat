@@ -95,6 +95,25 @@ biplot2d(ga,
 )
 ```
 
+## Alle Parteien
+
+Die nachfolgend Darstellung zeigt alle Parteien und Thesen. Die Zeilen (Thesen) und Spalten (Parteien) sind nach Ähnlichkeit gruppiert. Die baumartigen Strukturen unten und rechts (sog. Dendrogramme) zeigen an, wie stark sich die Parteien oder Thesen ähnlich sind.
+
+```{r img-heatmap-alle, echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
+gc <- g
+leftpoles(gc) <- ""
+bertinCluster(gc, 
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xsegs = c(0, .05, .62, .9, 1), 
+  ysegs = c(0, .1, .80, 1),
+  id = c(FALSE, FALSE)
+)
+```
+
+
 ## Die politischen Thesen
 
 Die im Wahl-O-Mat verwendeten Thesen sind in nachfolgender Tabelle aufgelistet. Zur schnelleren Auffindbarkeit ist die Tabelle alphabetisch nach der in den Grafiken genutzten Thesen-Kurzform (von uns erstellt) geordnet.
@@ -117,3 +136,5 @@ Genutzt wurde der Wahl-O-Mat-Datensatz der Bundeszentrale für Politische Bildun
 Die Daten und Grafiken wurden in der [R Software](https://www.r-project.org/) aufbereitet. Die Zustimmung zu einer These wurde mit `1`, Neutralität mit `0` und Ablehnung mit `-1` codiert. Den Code finden Sie [hier](https://github.com/markheckmann/wahlomat/).
 
 In der Heatmap (erste Grafik) wurden die Zeilen und Spalten nach den Ladungen der Parteien bzw. Thesen auf den ersten beiden Hauptkomponenten im Uhrzeigersinn sortiert. So entsteht eine Anordnung der Spalten (Parteien) und Zeilen (Thesen) nach Ähnlichkeit, die zugleich der Anordnung im Biplot entspricht.
+
+
