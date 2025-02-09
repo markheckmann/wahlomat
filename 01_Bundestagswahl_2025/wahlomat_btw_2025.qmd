@@ -22,30 +22,27 @@ grid_file <- "data/grid.xlsx"
 
 ```{r echo=FALSE}
 g <- importExcel(grid_file)
-thesen <- rightpoles(g)
-rightpoles(g) <- paste("↑", thesen)
-leftpoles(g) <- paste(thesen, "↓")
-
+leftpoles(g) <- rightpoles(g)
+# rightpoles(g) <- paste("↑", thesen)
+# leftpoles(g) <- paste(thesen, "↓")
 parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
 ga <- g[, parteien_auswahl]
 ```
 
 Im Folgenden werden die im [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) der [Bundeszentrale für Politische Bildung](https://www.bpb.de/) (BPB) für die Bundestagswahl 2025 verwendeten politischen Thesen und zugehörigen Parteienpositionen visuell dargestellt.
 
-
-## Antworten zu den Thesen 
+## Antworten zu den Thesen
 
 Nachfolgende Grafik (Heatmap) zeigt die Haltung *ausgewählter* Parteien (aus Gründen der Übersichtlichkeit) zu den 38 im Wahl-O-Mat verwendeten politischen Thesen. Zustimmung und Ablehnung wird durch Farben (grün/rot) dargestellt. Dies ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen Thesen. Die Spalten sind so sortiert, dass Parteien mit ähnlichen Antworten nebeneinander stehen. Man kann so schnell erkennen, welche Parteien inhaltlich nah beieinander liegen. Die Zeilen sind ebenfalls so sortiert, dass Thesen bei denen die Parteien insgesamt ähnlich geantwortet haben untereinander stehen.
 
 **Lesehilfe**
 
-- *Spalten (Parteien)*: Jede Spalte enthält die Antworten einer Partei (z. B. SPD, CDU/CSU, AfD).
-- *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen einführen" oder "Mindestlohn auf 15 Euro erhöhen". Die ausführliche Formulierung der These finden Sie in der Tabelle weiter unten.
-- *Farben*:
-  - *Grün*: Die Partei unterstützt die These (Aufwärtspfeil, rechte Seite).
-  - *Rot*: Die Partei lehnt die These ab (Abwärtspfeil, linke Seite).
-  - *Neutral* (dunkle Farbe): neutrale Position.
-
+-   *Spalten (Parteien)*: Jede Spalte enthält die Antworten einer Partei (z. B. SPD, CDU/CSU, AfD).
+-   *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen einführen" oder "Mindestlohn auf 15 Euro erhöhen". Die ausführliche Formulierung der These finden Sie in der Tabelle weiter unten.
+-   *Farben*:
+    -   *Grün*: Die Partei unterstützt die These.
+    -   *Rot*: Die Partei lehnt die These ab.
+    -   *Neutral* (dunkle Farbe): neutrale Position.
 
 ```{r include=FALSE, echo=FALSE, fig.width = 9, fig.height=9}
 # nicht genutzt
@@ -67,10 +64,10 @@ bertin(ga_2d[, e_ii],
   showvalues = FALSE,
   cex.elements = .75,
   xlim = c(.33, .67),
-  ylim = c(0, .8)
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE)
 )
 ```
-
 
 ## Räumliche Darstellung
 
@@ -82,11 +79,12 @@ Die Punkte repräsentieren die Parteien. Ihre Positionen im Raum zeigt zum einen
 
 **Achsen (Thesen)**
 
-Die Achsen repräsentieren die politischen Thesen. Thesen weisen in eine ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen ähnlich ist. Wenn man das Lot von einem Punkt (Partei) auf eine Achse (These) fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend ist. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
+Die Achsen repräsentieren die politischen Thesen. Die Achse zeigt stets in Richtung *Zustimmung zur These*, was durch den kleinen Aufwärtspfeil vor der These angedeutet wird. Thesen mit einem ähnlichen Antwortmuster zeigen in eine ähnliche Richtung. Wenn man das Lot von einem Punkt (Partei) auf eine Achse (These) fällt, kann man tendenziell ablesen, ob die Partei eher zustimmend oder ablehnend ist. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
 
-*Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These) "*Kernenergie zur Stromerzeugung nutzen*" einen hohen Wert, d.h. sie stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen Wert, d.h. sie stimmen der These nicht zu. *Hinweis*: Bitte beachten Sie, dass die 2D-Darstellung, nicht alle Werte zu 100% genau repräsentiert.
+*Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These) "*Kernenergie zur Stromerzeugung nutzen*" einen hohen Wert, d.h. sie stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen Wert, d.h. sie stimmen der These nicht zu. *Hinweis*: Bitte beachten Sie, dass die 2D-Darstellung die Position der Parteien auf den Achsen/Thesen nicht 100% genau abbildet.
 
 ```{r img-biplot, echo=FALSE, fig.width = 9, fig.height=6}
+rightpoles(ga) <- paste("↑", rightpoles(ga))
 leftpoles(ga) <- NA
 set.seed(11)
 biplot2d(ga,
@@ -110,14 +108,12 @@ df |>
   select(c(Kurzform = these_kurzform, These = these_these)) |>
   arrange(de_order) |>
   knitr::kable()
-  # flextable(cwidth = c(3, 6)) |>
-  # set_header_labels(values = c("These (Kurzform)", "These"))
 ```
 
 ## Daten und Methodik
 
 Genutzt wurde der Wahl-O-Mat-Datensatz der Bundeszentrale für Politische Bildung (BPB) <https://www.bpb.de/themen/wahl-o-mat/bundestagswahl-2025/558463/download/>
 
-Die Daten und Grafiken wurden in der [R Software](https://www.r-project.org/) aufbereitet. Die Zustimmung zu einer These wurde mit `1`, Neutralität mit `0` und Ablehnung mit `-1` codiert. Den Code finden Sie [hier](https://github.com/markheckmann/wahlomat/). 
+Die Daten und Grafiken wurden in der [R Software](https://www.r-project.org/) aufbereitet. Die Zustimmung zu einer These wurde mit `1`, Neutralität mit `0` und Ablehnung mit `-1` codiert. Den Code finden Sie [hier](https://github.com/markheckmann/wahlomat/).
 
 In der Heatmap (erste Grafik) wurden die Zeilen und Spalten nach den Ladungen der Parteien bzw. Thesen auf den ersten beiden Hauptkomponenten im Uhrzeigersinn sortiert. So entsteht eine Anordnung der Spalten (Parteien) und Zeilen (Thesen) nach Ähnlichkeit, die zugleich der Anordnung im Biplot entspricht.

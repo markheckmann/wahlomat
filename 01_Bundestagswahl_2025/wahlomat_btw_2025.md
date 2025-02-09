@@ -28,9 +28,8 @@ insgesamt ähnlich geantwortet haben untereinander stehen.
   “Mindestlohn auf 15 Euro erhöhen”. Die ausführliche Formulierung der
   These finden Sie in der Tabelle weiter unten.
 - *Farben*:
-  - *Grün*: Die Partei unterstützt die These (Aufwärtspfeil, rechte
-    Seite).
-  - *Rot*: Die Partei lehnt die These ab (Abwärtspfeil, linke Seite).
+  - *Grün*: Die Partei unterstützt die These.
+  - *Rot*: Die Partei lehnt die These ab.
   - *Neutral* (dunkle Farbe): neutrale Position.
 
 <img src="wahlomat_btw_2025_files/figure-commonmark/img-heatmap-1.png"
@@ -52,19 +51,20 @@ haben. Weiterhin haben Parteien, die nah beieinander sind, tendenziell
 
 **Achsen (Thesen)**
 
-Die Achsen repräsentieren die politischen Thesen. Thesen weisen in eine
-ähnliche Richtung, wenn das Antwortmuster der Parteien auf diesen
-ähnlich ist. Wenn man das Lot von einem Punkt (Partei) auf eine Achse
-(These) fällt, kann man tendenziell ablesen, ob die Partei eher
-zustimmend oder ablehnend ist. Die Mitte (Ursprung des
+Die Achsen repräsentieren die politischen Thesen. Die Achse zeigt stets
+in Richtung *Zustimmung zur These*, was durch den kleinen Aufwärtspfeil
+vor der These angedeutet wird. Thesen mit einem ähnlichen Antwortmuster
+zeigen in eine ähnliche Richtung. Wenn man das Lot von einem Punkt
+(Partei) auf eine Achse (These) fällt, kann man tendenziell ablesen, ob
+die Partei eher zustimmend oder ablehnend ist. Die Mitte (Ursprung des
 Koordinatensystems) ist das neutrale Zentrum.
 
 *Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These)
 “*Kernenergie zur Stromerzeugung nutzen*” einen hohen Wert, d.h. sie
 stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen
 Wert, d.h. sie stimmen der These nicht zu. *Hinweis*: Bitte beachten
-Sie, dass die 2D-Darstellung, nicht alle Werte zu 100% genau
-repräsentiert.
+Sie, dass die 2D-Darstellung die Position der Parteien auf den
+Achsen/Thesen nicht 100% genau abbildet.
 
 ![](wahlomat_btw_2025_files/figure-commonmark/img-biplot-1.png)
 
