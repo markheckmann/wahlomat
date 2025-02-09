@@ -37,7 +37,7 @@ x2 <- x2 |> mutate(
 
 df <- x2 |> pivot_wider(
   id_cols = c(these_nr, these_titel, these_kurzform, these_these),
-  names_from = partei_kuerzel, values_from = position_num
+  names_from = partei_kurzbezeichnung, values_from = position_num
 )
 
 df_grid <- df |>

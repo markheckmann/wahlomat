@@ -97,7 +97,7 @@ biplot2d(ga,
 
 ## Alle Parteien
 
-Die nachfolgend Darstellung zeigt alle Parteien und Thesen. Die Zeilen (Thesen) und Spalten (Parteien) sind nach Ähnlichkeit gruppiert. Die baumartigen Strukturen unten und rechts (sog. Dendrogramme) zeigen an, wie stark sich die Parteien oder Thesen ähnlich sind.
+Die nachfolgend Darstellung zeigt alle Parteien und Thesen. Die Zeilen (Thesen) und Spalten (Parteien) sind nach Ähnlichkeit gruppiert. Die baumartigen Strukturen unten und rechts (sog. Dendrogramme) zeigen an, wie ähnlich sich die Bewertungsmuster der Parteien oder Thesen sind.
 
 ```{r img-heatmap-alle, echo=FALSE, fig.width = 10, fig.height=10, out.width=800, out.height=800}
 gc <- g

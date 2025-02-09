@@ -73,7 +73,7 @@ Achsen/Thesen nicht 100% genau abbildet.
 Die nachfolgend Darstellung zeigt alle Parteien und Thesen. Die Zeilen
 (Thesen) und Spalten (Parteien) sind nach Ähnlichkeit gruppiert. Die
 baumartigen Strukturen unten und rechts (sog. Dendrogramme) zeigen an,
-wie stark sich die Parteien oder Thesen ähnlich sind.
+wie ähnlich sich die Bewertungsmuster der Parteien oder Thesen sind.
 
 <img
 src="wahlomat_btw_2025_files/figure-commonmark/img-heatmap-alle-1.png"
