@@ -22,78 +22,65 @@ library(stringi)
 library(janitor)
 library(openxlsx)
 library(flextable)
-library(OpenRepGrid) # >= 0.1.17.9001 für cbind
+library(OpenRepGrid)
 library(glue)
 
-# Biplot Ausgabe
-heatmap_width <- 790
-heatmap_height <- heatmap_width * .75
+stopifnot(packageVersion("OpenRepGrid") >= "0.1.16") # >= 0.1.17.9002 oder höher benötigt
 
-# Farben Abweichungen
+# Farben für Abweichungen
 blue_dark <- "#01178B"
 blue_mid <- "#7677C4"
 blue_light <- "#EEEEFF"
 
-file_in <- "data/wide_format.xlsx"
-grid_file <- "data/grid_chatgpt.xlsx"
-grid_file_spd <- "data/grid_chatgpt_spd.xlsx"
-grid_file_buendnis <- "data/grid_chatgpt_bundnis_deutschland.xlsx"
+# Output Dateien
+file_in <- "data/alle_parteien_wide_v1.xlsx"
+grid_file_offiziell <- "data/grid/alle_parteien_offiziell_v1.xlsx"
+grid_file_ki <- "data/grid/alle_parteien_ki_v1.xlsx"
+grid_file_spd <- "data/grid/ki_spd_v1.xlsx"
+grid_file_buendnis <- "data/grid/ki_bundnis_deutschland_v1.xlsx"
+
+file_out_grid_offiziell <- file.path(data_folder, "grid/alle_parteien_offiziell_v1.xlsx")
+file_out_grid_ki <- file.path(data_folder, "grid/alle_parteien_ki_v1.xlsx")
+file_template_ki_partei <- file.path(data_folder, "grid/ki_{partei}_v1.xlsx")
+
 ```
 
 ```{r echo=FALSE}
 g <- importExcel(grid_file)
 leftpoles(g) <- rightpoles(g)
-parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
-parteien_chatgpt <- c(37, 32, 35, 33, 29, 36, 34, 38, 31, 39, 30)
+parteien_auswahl <- c("SPD", "CDU/CSU", "GRÜNE", "FDP", "AfD", "Die Linke", "Freie Wähler", "Volt", "Bündnis Deutschland", "WerteUnion", "BSW")
+parteien_chatgpt <- glue("{parteien_auswahl}(c)")
 ga <- g[, c(rbind(parteien_auswahl, parteien_chatgpt))]
 ```
 
-![](img/roboter_spd_cdu.png){width="70%" fig-align="center"}
+![](img/roboter_spd_cdu.webp){width="70%" fig-align="center"}
 
-> TODO: Positionen händisch prüfen SPD: Pflichtjahr
-
-*Hinweis: Dieser Beitrag knüpft an meinen [letzten Post](https://markheckmann.de/posts/2025-bundestagswahl-wahlomat/wahlomat_btw_2025) an, in dem die Haltung der
-Parteien zu den politischen Thesen im [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) grafisch
+*Hinweis: Dieser Beitrag knüpft an meinen [letzten Post](https://markheckmann.de/posts/2025-bundestagswahl-wahlomat/wahlomat_btw_2025) an, in dem die Haltung der Parteien zu den politischen Thesen im [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) grafisch
 aufbereitet wurden.*
 
-Die Entwicklungen im Bereich der [Large Language Models (LLM)](https://en.wikipedia.org/wiki/Large_language_model) haben in den letzten Jahren für viel Aufsehen gesorgt. So ist [ChatGPT](https://openai.com/chatgpt/), mit [mehr als 200 Mio. Nutzern](https://www.zeit.de/digital/2024-08/kuenstliche-intelligenz-open-ai-chat-gpt-nutzerzahl-200-millionen)
-weltweit, vielen Menschen ein Begriff. In diesem Beitrag will ich schauen, wie ChatGPT (Modell GPT-4o) auf die
+Die Entwicklungen im Bereich der [Large Language Models (LLM)](https://en.wikipedia.org/wiki/Large_language_model) haben in den letzten Jahren für viel Aufsehen gesorgt. [ChatGPT](https://openai.com/chatgpt/), mit [mehr als 200 Mio. Nutzern](https://www.zeit.de/digital/2024-08/kuenstliche-intelligenz-open-ai-chat-gpt-nutzerzahl-200-millionen) weltweit, ist vielen ein Begriff. In diesem Beitrag untersuche ich, wie ChatGPT (Modell GPT-4o) auf die
 politischen Thesen des [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) der [Bundeszentrale für
-Politische Bildung](https://www.bpb.de/) zur Bundestagswahl 2025 antwortet, wenn es instruiert wird, wie ein
-*typischer Wähler der jeweiligen Partei* zu antworten. Zu diesem Zweck hat ChatGPT pro Partei einen
-entsprechenden Prompt erhalten. Hier ein Auszug anhand des Beispiels der SPD:
+Politische Bildung](https://www.bpb.de/) zur Bundestagswahl 2025 antwortet, wenn es instruiert wird, wie ein *typischer Wähler der jeweiligen Partei* zu reagieren. 
+
+Zu diesem Zweck hat ChatGPT für jede Partei einen entsprechenden Prompt erhalten. Hier ein Auszug aus dem Prompt für die SPD:
 
 > Du bist ein überzeugter Wähler der Partei SPD. Deine Aufgabe ist es, die folgenden 38 politischen Thesen so
 > zu beantworten, wie es ein typischer Anhänger der Partei SPD tun würde.
 
-Die vollständigen Instruktionen sind [im Anhang Ende des Beitrags](#sec-prompt) dargestellt. Die Antworten von
-ChatGPT werden im Folgenden mit den [offiziellen Positionen der Parteien](#sec-faq) aus dem Wahl-O-Mat
-abgeglichen. Dabei untersuche ich unter anderem, welche Abweichungen es gibt und wie die Antworten von Mal zu
-Mal variieren.
+Die vollständigen Instruktionen sind [am Ende des Beitrags](#sec-prompt) dargestellt. Die Antworten von ChatGPT werden im Folgenden mit den [offiziellen Positionen der Parteien](#sec-faq) aus dem Wahl-O-Mat abgeglichen. Ich analysiere unter anderem, wo es Abweichungen gibt und ob die Antworten variieren.
 
 ## Antworten zu den politischen Thesen
 
-@fig-heatmap-vergleich zeigt die Antworten der Parteien und der *ChatGPT-Wähler* (Mehrzahl, da einmal pro
-Partei) zu den 38 im Wahl-O-Mat verwendeten [politischen Thesen](#sec-thesen). Zustimmung, Ablehnung und Neutralität
-wird durch Farben dargestellt. Dies ermöglicht einen schnellen Vergleich der Parteipositionen zu verschiedenen
-Thesen. Die offizielle Antwort der Partei und die des ChatGPT-Wählers (Zusatz "(c)" hinter dem
-Parteinamen) stehen jeweils direkt nebeneinander. Man kann so leicht erkennen, wo Partei und ChatGPT-Wähler
-unterschiedlich geantwortet haben.
+@fig-heatmap-vergleich zeigt die Antworten der Parteien und der *ChatGPT-Wähler* (also des KI-Wählers für jede Partei) auf die 38 im Wahl-O-Mat verwendeten [politischen Thesen](#sec-thesen). Zustimmung, Ablehnung und Neutralität werden farblich dargestellt, um einen schnellen Vergleich der Positionen zu ermöglichen. Die offizielle Parteiposition steht direkt neben der entsprechenden Antwort des ChatGPT-Wählers, erkennbar am Zusatz „(c)“ hinter dem Parteinamen. So lassen sich Abweichungen leicht identifizieren.
 
 **Lesehilfe**
 
--   *Spalten (Parteien)*: Jede Spalte enthält die Antworten einer Partei (z. B. SPD, FDP) oder des
-    ChatGPT-Wählers (z. B. SPD(c), FDP(c))
--   *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen
-    einführen" oder "Mindestlohn auf 15 Euro erhöhen". Die ausführliche Formulierung der These finden Sie in
-    der @tbl-thesen weiter unten.
--   *Farben*: [Grün]{style="background-color:#02F900; color:#000000; padding: 0 2px;"} = Die Partei
-    unterstützt die These, [Oliv]{style="background-color:#7F7F00; color:#FFFFFF; padding: 0 2px;"}= neutrale
-    Position, [Rot]{style="background-color:#FF2500; color:#FFFFFF; padding: 0 2px;"} = Die Partei lehnt die
-    These ab.
+-   *Spalten (Parteien)*: Jede Spalte enthält die Antworten einer Partei (z. B. SPD, FDP) oder des ChatGPT-Wählers (z. B. SPD(c), FDP(c))
+-   *Zeilen (Thesen)*: Jede Zeile steht für eine politische These (Kurzform), z. B. "Tempolimit auf Autobahnen einführen" oder "Mindestlohn auf 15 Euro erhöhen". Die ausführliche Formulierung der These finden Sie in der @tbl-thesen weiter unten.
+-   *Farben*: [Grün]{style="background-color:#02F900; color:#000000; padding: 0 2px;"} = Zustimmung zur These, [Oliv]{style="background-color:#7F7F00; color:#FFFFFF; padding: 0 2px;"}= Neutrale
+    Position, [Rot]{style="background-color:#FF2500; color:#FFFFFF; padding: 0 2px;"} = Ablehnung der These.
 
-Man erkennt, dass die Antwortmuster für die offizielle Parteiposition und die des ChatGPT-Wählers ähnlich aber
-nie identisch sind.
+Es zeigt sich, dass die Antwortmuster der ChatGPT-Wähler und die offiziellen Parteipositionen oft ähnlich, aber nie identisch sind.
 
 ```{r}
 #| label: fig-heatmap-vergleich
@@ -110,7 +97,7 @@ eo <- ee |> str_subset("\\(c\\)", negate = TRUE)
 ec <- paste0(eo, "(c)")
 ei <- c(rbind(eo, ec))
 ii <- match(ei, ee)
-ii <- ii[c(3:22, 1:2)]
+ii <- ii[c(3:22, 1:2)] # rotieren, für links - rechts Sortierung
 ga_4 <- ga_3[, ii]
 bertin(ga_4,
   align = FALSE,
@@ -125,16 +112,16 @@ x0 <- seq(from = .33, to = .67, length.out = 12)
 segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
 ```
 
-## Wo weicht die Antwort des ChatGPT-Wählers von seiner Partei ab?
+## Wo weichen die Antworten des ChatGPT-Wählers von seiner Partei ab?
 
-Nachfolgende Grafik zeigt, an welchen Stellen es Abweichungen zwischen den der offiziellen Position und den
-Antworten der ChatGPT-Wähler gab.
-[Dunkelblau]{style="background-color:#01178B; color:#FFFFFF; padding: 0 2px;"} markiert eine große
-Abweichungen von 2 Bewertungsschritten (*Zustimmung anstatt Ablehnung* oder *Ablehnung anstatt Zustimmung*),
-[blau]{style="background-color:#7677C4; color:#FFFFFF; padding: 0 2px;"} eine Abweichungen von 1
-Bewertungsschritt (*Zustimmung oder Ablehnung anstatt Neutral* oder *Neutral anstatt Zustimmung oder
-Ablehnung*) das und [hellblau]{style="background-color:#EEEEFF; color:#000000; padding: 0 2px;"}
-Übereinstimmung der Antworten. Es wird deutlich, dass die Anzahl an Abweichungen pro Partei und These sehr
+@fig-heatmap-abweichungen zeigt, wo die ChatGPT-Wähler von der offiziellen Parteiposition abweichen. Die Abstufungen sind:
+
+- [Dunkelblau]{style="background-color:#01178B; color:#FFFFFF; padding: 0 2px;"} Große Abweichung (zwei Stufen Unterschied, z. B. Zustimmung statt Ablehnung).
+- [Blau]{style="background-color:#7677C4; color:#FFFFFF; padding: 0 2px;"} Eine Stufe Unterschied (z. B. Zustimmung statt Neutral).
+- [Hellblau]{style="background-color:#EEEEFF; color:#000000; padding: 0 2px;"}
+Übereinstimmung der Antworten. 
+
+Es wird deutlich, dass die Anzahl an Abweichungen pro Partei und These sehr
 unterschiedlich verteilt sind.
 
 ```{r}
@@ -171,10 +158,7 @@ segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
 
 ## Wo weichen die Antworten am häufigsten von der Partei ab?
 
-Nachfolgende Grafik zeigt, bei welche Partei am meisten Abweichungen zwischen den der offiziellen Position und
-den Antworten der ChatGPT-Wähler auftreten. Hierzu werden die Zeilen und Spalten aus Grafik
-[@fig-heatmap-abweichungen] betrachtet. Das Bündnis Deutschland hat z.B. mit 15 Abweichungen dreimal so viele
-wie Die Linke.
+@fig-abweichungen-partei zeigt, bei welcher Partei die meisten Abweichungen auftreten. Hierzu werden die Zeilen und Spalten aus Grafik [@fig-heatmap-abweichungen] ausgezählt. Beispielsweise weicht der ChatGPT-Wähler beim Bündnis Deutschland 15-mal von der offiziellen Linie ab, während Die Linke nur fünf Abweichungen verzeichnet.
 
 ```{r}
 #| label: fig-abweichungen-partei
@@ -231,10 +215,7 @@ ggplot(df_fehler_parteien, aes(x = fct_reorder(name, n_gesamt), y = perc, fill =
   th
 ```
 
-Bei den Thesen ist die Situation ähnlich. Auch hier ist die Verteilung der Abweichung ungleich. Angeführt
-werden die Abweichungen von der These "*Ehrenamtliche Tätigkeiten für Rente anrechnen*". Hier weicht der
-ChatGPT-Wähler in 10 von 11 Fällen von der offiziellen Position ab. Bei "*Tempolimit auf Autobahn einführen*"
-kommt es nur zu einer Abweichung. Nur bei 3 der 38 Thesen kommt es zu gar keiner Abweichung.
+Bei den Thesen ist die Situation ähnlich (@fig-abweichungen-these). Auch hier ist die Verteilung der Abweichungen ungleich. Angeführt werden die Abweichungen von der These "*Ehrenamtliche Tätigkeiten für Rente anrechnen*". Hier weicht der ChatGPT-Wähler in 10 von 11 Fällen von der offiziellen Position ab. Bei "*Tempolimit auf Autobahn einführen*" kommt es nur zu einer Abweichung. Nur bei 3 der 38 Thesen kommt es zu gar keiner Abweichung.
 
 ```{r}
 #| label: fig-abweichungen-these
@@ -263,7 +244,7 @@ ggplot(df_fehler_thesen, aes(x = fct_reorder(name, n_gesamt), y = perc, fill = v
   geom_col() +
   coord_flip() +
   theme_bw() +
-  labs(x = "", y = "") + 
+  labs(x = "", y = "") +
   geom_text(aes(label = ifelse(value == 0, "", n)), size = 3, color = "white", position = position_stack(vjust = .5)) +
   scale_fill_manual("Größe der\nAbweichung", values = c("0" = "transparent", "1" = "#7775C2", "2" = "darkblue"), breaks = c(1, 2)) +
   scale_y_continuous(expand = expansion(), labels = scales::percent_format(), limits = c(0, 1)) +
@@ -282,8 +263,7 @@ ggplot(df_fehler_thesen, aes(x = fct_reorder(name, n_gesamt), y = perc, fill = v
 
 Nachfolgende Grafik entspricht @fig-heatmap-vergleich, jedoch werden die Spalten hier zusätzlich nach
 Ähnlichkeit sortiert. Während Partei und ChatGPT-Wähler bei Die Linke, FDP oder AfD direkt nebeneinander
-liegen, ist die bei Volt, Wertunion und Freie Wähler nicht der Fall. So liegt Freie Wähler(c) (ChatGPT-Wähler)
-zwischen CDU/CSU und Wertunion, die Partei Freie Wähler selber jedoch zwischen SPD und FDP.
+liegen, ist dies z.B. bei Wertunion und Freie Wähler nicht der Fall. So liegt Freie Wähler(c) (ChatGPT-Wähler) zwischen CDU/CSU und Wertunion, die Partei Freie Wähler selber jedoch zwischen SPD und FDP.
 
 ```{r}
 #| label: fig-heatmap-ordered
@@ -307,9 +287,7 @@ bertin(ga_2d[, e_ii],
 )
 ```
 
-Der nachfolgende Biplot (ein Streudiagramm mit mehr als zwei Achsen) stellt die Daten aus @fig-heatmap-ordered
-in einem Koordinatensystem dar. Er stellt die Beziehungen zwischen den Thesen und Parteien/ChatGPT-Wähler in
-einem Bild dar. So lässt sich @fig-biplot interpretieren:
+Der nachfolgende Biplot (ein Streudiagramm mit mehr als zwei Achsen, @fig-biplot) stellt die Parteien und Thesen in einem Bild dar. Er lässt sich wie folgt interpretieren:
 
 -   **Punkte (Parteien/ChatGPT-Wähler)**
 
@@ -320,16 +298,11 @@ einem Bild dar. So lässt sich @fig-biplot interpretieren:
 
     Die Achsen repräsentieren die politischen Thesen. Die Achse zeigt stets in Richtung *Zustimmung zur
     These*. Wenn man das Lot von einem Punkt (Partei/ChatGPT-Wähler) auf eine Achse (These) fällt, kann man
-    tendenziell ablesen, ob die Partei/ChatGPT-Wähler eher zustimmend oder ablehnend ist. Die Mitte (Ursprung
-    des Koordinatensystems) ist das neutrale Zentrum.
+    tendenziell ablesen, ob die Partei/ChatGPT-Wähler eher zustimmend oder ablehnend ist. Die Mitte (Ursprung des Koordinatensystems) ist das neutrale Zentrum.
 
-*Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These) "*Kernenergie zur Stromerzeugung nutzen*" einen
-hohen Wert, d.h. sie stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen Wert, d.h. sie
-stimmen der These nicht zu. *Hinweis*: Bitte beachten Sie, dass die 2D-Darstellung die Position der Parteien
-auf den Achsen/Thesen nicht 100% genau abbildet.
+*Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These) "*Kernenergie zur Stromerzeugung nutzen*" einen hohen Wert, d.h. sie stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen Wert, d.h. sie stimmen der These nicht zu. *Hinweis*: Bitte beachten Sie, dass die 2D-Darstellung die Position der Parteien auf den Achsen/Thesen nicht 100% genau abbildet.
 
-Auch hier zeigt sich noch einmal grafisch, was wir bereits oben beobachtet haben. Insgesamt liegen die meisten
-ChatGPT-Wähler nah an ihren Parteien. Bei Freie Wähler, Wertunion und Volt gibt es sichtbare Abweichungen.
+Auch hier zeigt sich noch einmal grafisch, was wir bereits oben beobachtet haben. Insgesamt liegen die meisten ChatGPT-Wähler nah an ihren Parteien. Bei Freie Wähler und Wertunion gibt es sichtbare Abweichungen.
 
 ```{r}
 #| label: fig-biplot
@@ -363,11 +336,7 @@ biplot2d(ga2,
 
 ## Antwortet ein ChatGPT-Wähler immer gleich?
 
-Der ChatGPT-Wähler hat pro Partei bisher einmal geantwortet. Wie stark variieren die Antworten jedoch, wenn man
-die Abfrage wiederholt? Dies wird im Folgenden beispielhaft für die SPD und das Bündnis Deutschland
-untersucht. Zu diesem Zweck hat der ChatGPT-Wähler pro Partei 20 Mal mit den gleichen Instruktionen
-geantwortet. Die ersten 20 Spalten nachfolgender Grafik stellen die 20 Antwortmuster dar. In der letzten
-Spalte ist die offizielle Parteiposition dargestellt.
+Eine spannende Frage ist, ob ChatGPT bei wiederholten Anfragen konsistente Antworten liefert. Dazu wurden für die Parteien SPD und Bündnis Deutschland jeweils 20 Simulationen mit identischen Instruktionen durchgeführt. @fig-heatmap-spd zeigt die Antworten von 20 ChatGPT-Wählern der SPD im Vergleich zur offiziellen Parteiposition (letzte Spalte).
 
 ```{r}
 #| label: fig-heatmap-spd
@@ -396,20 +365,9 @@ x0 <- seq(from = .33, to = .67, length.out = 22)[21:22]
 segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
 ```
 
-Es lässt sich erkennen, dass sich die Antworten von Mal zu Mal unterscheiden. Es betrifft jedoch nicht alle,
-sondern nur manche Thesen, bei denen die Antwort variiert. Bei *Tempolimit auf Autobahnen einführen* antwortet
-der ChatGPT-Wähler der SPD konstant zustimmend. Bei *Volksentscheid auf Bundesebene ermöglichen* gibt er drei
-Mal von neutral abweichende Antworten. Bei *Beratungspflicht zu Schwangerschaftsabbruch* kommen alle drei
-Antwortoptionen vor. Auch zeigt sich, dass der ChatGPT-Wähler bei einigen Thesen systematisch falsch liegt. So
-schwanken die Antworten bei *Soziales Pflichtjahr für Jugendliche einführen* zwischen Zustimmung und neutral
-während die offizielle Position Ablehnung ist.
+Während einige Antworten konstant blieben (*Tempolimit auf Autobahnen* wurde immer unterstützt), gab es bei anderen Thesen Variationen (*Volksentscheid auf Bundesebene ermöglichen* wechselte zwischen Zustimmung und Neutralität). Bei *Beratungspflicht zu Schwangerschaftsabbruch* kommen sogar alle drei Antwortoptionen vor. Auch zeigt sich, dass der ChatGPT-Wähler bei einigen Thesen durchgehend von der offiziellen Position abweicht. So schwanken die Antworten bei *Soziales Pflichtjahr für Jugendliche einführen* zwischen Zustimmung und neutral während die offizielle Position Ablehnung ist.
 
-Folgende Grafik zeigt die Ergebnisse von 20 Abfragen des ChatGPT-Wählers für das Bündnis Deutschland. Das
-Bündnis Deutschland hatte in @fig-abweichungen-these die meisten Abweichungen aufgewiesen. Hier sieht man,
-dass die Antworten im Vergleich zur SPD bei mehr Thesen variieren. Und auch hier weicht der ChatGPT-Wähler bei
-mehreren Thesen systematisch von der offiziellen Position ab, am stärksten bei *Arbeitserlaubnis für
-Asylsuchende sofort*, wo der ChatGPT-Wähler durchgehend gleich antwortet, jedoch entgegen der offiziellen
-Parteiposition.
+@fig-buendnis zeigt die Ergebnisse der Simulation für das Bündnis Deutschland. Das Bündnis Deutschland hatte bereits in @fig-abweichungen-these die meisten Abweichungen aufgewiesen und auch hier variieren die  Antworten häufiger als bei der SPD. Besonders auffällig: Bei der These *Arbeitserlaubnis für Asylsuchende sofort* antworteten die ChatGPT-Wähler durchgängig ablehnend und somit konträr zur offiziellen Parteiposition (Zustimmung).
 
 ```{r}
 #| label: fig-buendnis
@@ -437,11 +395,7 @@ x0 <- seq(from = .33, to = .67, length.out = 22)[21:22]
 segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
 ```
 
-Abschließend werden die 20 ChatGPT-Wähler der SPD in einem Biplot dargestellt. Obgleich es zu Variationen im
-Antwortverhalten sowie teils systematischen Abweichungen zur Parteiposition kommt, stimmt der ChatGPT-Wähler
-bei der Mehrzahl der Thesen mit der Partei überein. Die räumliche Lage im Biplot variiert deshlab nur leicht.
-Die 20 ChatGPT-Wähler überdecken hier die Partei SPD als auch die Grünen, sind aber noch deutlich von den
-anderen Parteipositionen abgegrenzt.
+Abschließend werden die 20 ChatGPT-Wähler der SPD in einem Biplot dargestellt. Obgleich es zu Variationen im Antwortverhalten sowie teils systematischen Abweichungen zur Parteiposition kommt, stimmt der ChatGPT-Wähler dennoch bei der Mehrzahl der Thesen mit der Partei überein. Die räumliche Lage im Biplot variiert deshalb nur leicht. Die ChatGPT-Wähler überdecken hier die Partei SPD als auch die Grünen, sind aber noch deutlich von den anderen Parteien abgegrenzt.
 
 ```{r}
 #| label: fig-biplot-spd
@@ -470,35 +424,18 @@ biplot2d(gg_2d,
 )
 ```
 
-## Die politischen Thesen {#sec-thesen}
+## Fazit
 
-Die im Wahl-O-Mat verwendeten Thesen sind in der nachfolgenden Tabelle aufgelistet. Zur schnelleren
-Auffindbarkeit ist die Tabelle alphabetisch nach der in den Grafiken genutzten Thesen-Kurzform (von uns
-erstellt) geordnet.
+Die ChatGPT-Wähler spiegeln die Gesamtpositionen der Parteien recht gut wider, indem sie tendenziell näher an ihrer jeweiligen Partei als an anderen Parteien liegen. Bei Parteien mit ähnlichen Positionen kommt es zu Überschneidungen. Wie bei echten Parteianhängern variieren auch die Antworten von ChatGPT-Wählern. Manche Thesen zeigen hierbei eine starke Variabilität in den Antworten, während andere konstant bleiben. 
+Bemerkenswert ist, dass die Antworten teilweise systematisch von den offiziellen Parteipositionen abweichen.
 
-::: {style="font-size: 90%;"}
-```{r tabelle-thesen, echo=FALSE}
-#| label: tbl-thesen
-#| echo: false
-#| tbl-cap: Die 38 Wahl-O-Mat Thesen
-
-df <- read_excel(file_in)
-df <- df |> mutate(these_kurzform_cleaned = str_remove_all(these_kurzform, "„"))
-thesen_ordered <- stri_sort(df$these_kurzform_cleaned, locale = "de_DE")
-de_order <- match(df$these_kurzform_cleaned, thesen_ordered)
-df |>
-  select(c(Kurzform = these_kurzform, These = these_these)) |>
-  arrange(de_order) |>
-  knitr::kable()
-```
-:::
+Ob ChatGPT eine realistische Simulation eines Parteiwählers darstellt, lässt sich ohne Vergleichsdaten echter Anhänger nicht eindeutig beantworten. Die Antworten echter Wähler würden vermutlich deutlich stärker variieren, da sich selbst innerhalb einer Partei verschiedene Strömungen bilden (z. B. Merkelianer vs. Merzianer in der CDU). Zudem vertreten auch innerhalb dieser Lager einzelne Personen oft unterschiedliche Meinungen. Viele Wähler stellen zudem fest, dass ihre Übereinstimmung mit der bevorzugten Partei im Wahl-O-Mat selten 100 % erreicht. Dennoch könnte der Ansatz mit einem gezielteren Prompting oder Modellanpassungen hilfreich sein, um politische Positionen mittels KI zu analysieren.
 
 ## Anhang 
 
 ### Daten und Methodik
 
-Es wurde der [Wahl-O-Mat-Datensatz](https://www.bpb.de/themen/wahl-o-mat/bundestagswahl-2025/558463/download/)
-der Bundeszentrale für Politische Bildung (BPB) genutzt.
+Es wurde der [Wahl-O-Mat-Datensatz](https://www.bpb.de/themen/wahl-o-mat/bundestagswahl-2025/558463/download/) der Bundeszentrale für Politische Bildung (BPB) genutzt.
 
 Die Daten und Grafiken wurden in der [R Software](https://www.r-project.org/) aufbereitet. Die Heatmaps und
 Biplots wurden mit dem R Paket [OpenRepGrid](https://joss.theoj.org/papers/10.21105/joss.06918#) (Heckmann,
@@ -506,10 +443,7 @@ Biplots wurden mit dem R Paket [OpenRepGrid](https://joss.theoj.org/papers/10.21
 codiert. Bei der Analyse wurde die Möglichkeit Thesen doppelt zu gewichten oder zu überspringen nicht
 berücksichtigt. Den Code zur Analyse finden Sie [hier](https://github.com/markheckmann/wahlomat/).
 
-In den Heatmaps wurden die Zeilen und Spalten (z.B. @fig-heatmap-ordered) nach den Ladungen der Parteien bzw.
-Thesen auf den ersten beiden Hauptkomponenten im Uhrzeigersinn sortiert. So entsteht eine Anordnung der
-Spalten (Parteien) und Zeilen (Thesen) nach Ähnlichkeit, die zugleich der Anordnung im Biplot entspricht. Eine
-Übersicht zu Sortierungsmethoden (Seriation) für 2D-Matrizen findet man bei Hahsler (2017).
+In den Heatmaps wurden die Zeilen und Spalten (z.B. @fig-heatmap-ordered) nach den Ladungen der Parteien bzw. Thesen auf den ersten beiden Hauptkomponenten im Uhrzeigersinn sortiert. So entsteht eine Anordnung der Spalten (Parteien) und Zeilen (Thesen) nach Ähnlichkeit, die zugleich der Anordnung im Biplot entspricht. Eine Übersicht zu Sortierungsmethoden (Seriation) für 2D-Matrizen findet man bei Hahsler (2017).
 
 #### Der ChatGPT Prompt {#sec-prompt}
 
@@ -543,6 +477,29 @@ In den FAQ des Wahl-O-Mat wird unter dem Punkt *Wer hat die Thesen beantwortet?*
 > Somit können die Nutzerinnen und Nutzer im Wahl-O-Mat ihre eigenen Positionen mit den tatsächlichen und autorisierten Positionen der Parteien vergleichen.
 
 
+### Die politischen Thesen {#sec-thesen}
+
+Die im Wahl-O-Mat verwendeten Thesen sind in der nachfolgenden Tabelle aufgelistet. Zur schnelleren
+Auffindbarkeit ist die Tabelle alphabetisch nach der in den Grafiken genutzten Thesen-Kurzform (von uns
+erstellt) geordnet.
+
+::: {style="font-size: 90%;"}
+```{r tabelle-thesen, echo=FALSE}
+#| label: tbl-thesen
+#| echo: false
+#| tbl-cap: Die 38 Wahl-O-Mat Thesen
+
+df <- read_excel(file_in)
+df <- df |> mutate(these_kurzform_cleaned = str_remove_all(these_kurzform, "„"))
+thesen_ordered <- stri_sort(df$these_kurzform_cleaned, locale = "de_DE")
+de_order <- match(df$these_kurzform_cleaned, thesen_ordered)
+df |>
+  select(c(Kurzform = these_kurzform, These = these_these)) |>
+  arrange(de_order) |>
+  knitr::kable()
+```
+:::
+
 ## Literatur
 
 Hahsler, M. (2017). An experimental comparison of seriation methods for one-mode two-way data. *European
@@ -550,3 +507,5 @@ Journal of Operational Research*, 257, 133--143. <https://doi.org/10.1016/j.ejor
 
 Heckmann, M. (2024). OpenRepGrid: An R Package for the Analysis of Repertory Grid Data. *Journal of Open
 Source Software*, 9(104), 6918, <https://doi.org/10.21105/joss.06918>
+
+<img src="http://vg03.met.vgwort.de/na/32933e775beb4a2cad1b9f3ab558aa5e" width="1" height="1" alt="">

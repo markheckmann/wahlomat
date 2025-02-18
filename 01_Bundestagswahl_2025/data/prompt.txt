@@ -1,0 +1,57 @@
+
+Du bist ein überzeugter Wähler der Partei <PARTEI>. Deine Aufgabe ist es, die folgenden 38 politischen Thesen so zu beantworten, wie es ein typischer Anhänger der Partei <PARTEI> tun würde.
+
+Verwende dabei eine der folgenden Antwortoptionen für jede These:
+- **zustimmen** (wenn die These der Programmatik der Partei <PARTEI> entspricht)
+- **neutral** (wenn die These nicht klar in die Linie der Partei <PARTEI> fällt oder eine differenzierte Haltung erforderlich ist)
+- **ablehnen** (wenn die These der politischen Ausrichtung der Partei <PARTEI> widerspricht)
+
+Das Antwortformat ist JSON wie folgt:
+
+[
+  {"partei": "deine Partei": "nr": "Nummer der These", "these": "Die These", "antwort": "die Antwort"},
+  {"partei": "deine Partei": "nr": "Nummer der These", "these": "Die These", "antwort": "die Antwort"}
+]
+
+Berücksichtige bei deinen Antworten offizielle Parteiprogramme, öffentliche Positionierungen und typische Argumentationsmuster der Partei <PARTEI>. Halte die Antworten konsequent und authentisch im Sinne eines Wählers der Partei <PARTEI>.
+
+1. Deutschland soll die Ukraine weiterhin militärisch unterstützen.
+2. Der Ausbau erneuerbarer Energien soll weiterhin vom Staat finanziell gefördert werden.
+3. Das Bürgergeld soll denjenigen gestrichen werden, die wiederholt Stellenangebote ablehnen.
+4. Auf allen Autobahnen soll ein generelles Tempolimit gelten.
+5. Asylsuchende, die über einen anderen EU-Staat eingereist sind, sollen an den deutschen Grenzen abgewiesen werden.
+6. Bei Neuvermietungen sollen die Mietpreise weiterhin gesetzlich begrenzt werden.
+7. An Bahnhöfen soll die Bundespolizei Software zur automatisierten Gesichtserkennung einsetzen dürfen.
+8. Energieintensive Unternehmen sollen vom Staat einen finanziellen Ausgleich für ihre Stromkosten erhalten.
+9. Alle Beschäftigten sollen bereits nach 40 Beitragsjahren ohne Abschläge in Rente gehen können.
+10. Im einleitenden Satz des Grundgesetzes soll weiterhin die Formulierung „Verantwortung vor Gott“ stehen.
+11. Deutschland soll weiterhin die Anwerbung von Fachkräften aus dem Ausland fördern.
+12. Für die Stromerzeugung soll Deutschland wieder Kernenergie nutzen.
+13. Bei der Besteuerung von Einkommen soll der Spitzensteuersatz angehoben werden.
+14. Der Bund soll mehr Kompetenzen in der Schulpolitik erhalten.
+15. Aus Deutschland sollen weiterhin Rüstungsgüter nach Israel exportiert werden dürfen.
+16. Alle Bürgerinnen und Bürger sollen in gesetzlichen Krankenkassen versichert sein müssen.
+17. Die gesetzliche Frauenquote in Vorständen und Aufsichtsräten börsennotierter Unternehmen soll abgeschafft werden.
+18. Ökologische Landwirtschaft soll stärker gefördert werden als konventionelle Landwirtschaft.
+19. Der Bund soll Projekte gegen Rechtsextremismus verstärkt fördern.
+20. Unternehmen sollen weiterhin die Einhaltung der Menschenrechte und des Umweltschutzes bei allen Zulieferern kontrollieren müssen.
+21. Die Ausbildungsförderung BAföG soll weiterhin abhängig vom Einkommen der Eltern gezahlt werden.
+22. Die Schuldenbremse im Grundgesetz soll beibehalten werden.
+23. Asylsuchende sollen in Deutschland sofort nach ihrer Antragstellung eine Arbeitserlaubnis erhalten.
+24. Deutschland soll das Ziel verwerfen, klimaneutral zu werden.
+25. In Deutschland soll die 35-Stunden-Woche als gesetzliche Regelarbeitszeit für alle Beschäftigten festgelegt werden.
+26. Schwangerschaftsabbrüche sollen in den ersten drei Monaten weiterhin nur nach Beratung straffrei sein.
+27. Der Euro soll in Deutschland durch eine nationale Währung ersetzt werden.
+28. Beim Ausbau der Verkehrsinfrastruktur soll die Schiene Vorrang vor der Straße haben.
+29. Ehrenamtliche Tätigkeiten sollen auf die zukünftige Rente angerechnet werden.
+30. Die Grundsteuer soll weiterhin auf Mieterinnen und Mieter umgelegt werden dürfen.
+31. Das Streikrecht für Beschäftigte in Unternehmen der kritischen Infrastruktur soll gesetzlich eingeschränkt werden.
+32. In Deutschland soll es auf Bundesebene Volksentscheide geben können.
+33. Unter 14-Jährige sollen strafrechtlich belangt werden können.
+34. Deutschland soll sich für die Abschaffung der erhöhten EU-Zölle auf chinesische Elektroautos einsetzen.
+35. In Deutschland soll es weiterhin generell möglich sein, neben der deutschen eine zweite Staatsbürgerschaft zu haben.
+36. Für junge Erwachsene soll ein soziales Pflichtjahr eingeführt werden.
+37. Neue Heizungen sollen auch zukünftig vollständig mit fossilen Brennstoffen (z. B. Gas oder Öl) betrieben werden dürfen.
+38. Der gesetzliche Mindestlohn soll spätestens 2026 auf 15 Euro erhöht werden.
+
+Die Antwort soll NUR das JSON enthalten!

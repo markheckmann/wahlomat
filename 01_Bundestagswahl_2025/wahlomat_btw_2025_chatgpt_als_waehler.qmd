@@ -1,0 +1,585 @@
+---
+title: "ChatGPT macht den Wahl-O-Mat: Ein Experiment zur Bundestagswahl 2025"
+date: 2025-02-18
+categories: [statistics, DE]
+lang: de  
+format:
+  html:
+    anchor-sections: true
+execute:
+  freeze: auto
+  fig-dpi: 300
+editor:
+  markdown:
+    wrap: 110
+---
+
+```{r include=FALSE}
+library(readxl)
+library(tidyverse)
+library(stringi)
+library(janitor)
+library(openxlsx)
+library(flextable)
+library(OpenRepGrid)
+library(glue)
+
+stopifnot(packageVersion("OpenRepGrid") >= "0.1.16") # >= 0.1.17.9004 oder höher benötigt
+
+# Farben für Abweichungen
+blue_dark <- "#01178B"
+blue_mid <- "#7677C4"
+blue_light <- "#EEEEFF"
+
+# Output Dateien
+file_in <- "data/alle_parteien_wide_v1.xlsx"
+grid_file <- "data/grid/alle_parteien_offiziell_und_ki_v1.xlsx"
+grid_file_spd <- "data/grid/ki_spd_v1.xlsx"
+grid_file_buendnis <- "data/grid/ki_bundnis_deutschland_v1.xlsx"
+```
+
+```{r echo=FALSE}
+g <- importExcel(grid_file)
+leftpoles(g) <- rightpoles(g)
+parteien_auswahl <- c("SPD", "CDU/CSU", "GRÜNE", "FDP", "AfD", "Die Linke", "Freie Wähler", "Volt", "Bündnis Deutschland", "WerteUnion", "BSW")
+parteien_chatgpt <- glue("{parteien_auswahl}(c)")
+ga <- g[, c(rbind(parteien_auswahl, parteien_chatgpt))]
+```
+
+![](img/roboter_spd_cdu.webp){width="70%" fig-align="center"}
+
+*Hinweis: Dieser Beitrag knüpft an meinen [letzten Post](https://markheckmann.de/posts/2025-bundestagswahl-wahlomat/wahlomat_btw_2025) an, in dem die Haltung der Parteien zu den politischen Thesen im [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) grafisch
+aufbereitet wurde.*
+
+---- 
+
+Politische Entscheidungen sind oft komplex. Der [Wahl-O-Mat](https://www.wahl-o-mat.de/bundestagswahl2025) der [Bundeszentrale für Politische Bildung](https://www.bpb.de/) hilft Wählerinnen und Wählern, ihre eigenen Positionen mit den [offiziellen Positionen](#sec-faq) der Parteien abzugleichen. 
+
+In diesem Experiment habe ich [ChatGPT](https://openai.com/chatgpt/) (Modell GPT-4o) angewiesen, den Wahl-O-Mat aus der Perspektive eines typischen Wählers verschiedener Parteien zu beantworten. 
+
+🤖 Dazu hat ChatGPT für jede Partei einen entsprechenden Prompt erhalten:
+
+> Du bist ein überzeugter Wähler der Partei XYZ Deine Aufgabe ist es, die folgenden 38 politischen Thesen so
+> zu beantworten, wie es ein typischer Anhänger der Partei XYZ tun würde.
+
+📝 Die vollständigen Instruktionen finden sich [am Ende des Beitrags](#sec-prompt).
+
+Wie wird der KI-Wähler im Wahl-O-Mat antworten? Wird er die Positionen seiner Parteien genau wiedergeben? Wird es Abweichungen von der Positionen seiner Partei geben? Oder hat der KI-Wähler gar eine ganz eigene Meinung?
+
+
+## Ergebnis: Wo gibt es Übereinstimmungen und Unterschiede?
+
+Die farbcodierte Heatmap (@fig-heatmap-vergleich) zeigt die Antworten auf die 38 im Wahl-O-Mat verwendeten [politischen Thesen](#sec-thesen) auf einen Blick. 
+[Grün]{style="background-color:#02F900; color:#000000; padding: 0 2px;"} steht für Zustimmung, [Oliv]{style="background-color:#7F7F00; color:#FFFFFF; padding: 0 2px;"} für Neutralität und [Rot]{style="background-color:#FF2500; color:#FFFFFF; padding: 0 2px;"} für Ablehnung der These. 
+
+In den Spalten wechseln sich offizielle Parteiposition (schwarze Überschrift) mit den Antworten des KI-Wählers für diese Partei (graue Überschrift) ab. Der KI-Wähler ist auch durch den Zusatz „(c)“ (für ChatGPT) hinter dem Parteinamen erkennbar. 
+
+📌 **Es zeigt sich: Die Antworten des KI-Wählers und die offizielle Position seiner Partei stimmen bei vielen, aber nicht allen Thesen überein.**
+
+```{r}
+#| label: fig-heatmap-vergleich
+#| echo: false
+#| fig.width: 10
+#| fig.height: 7.5
+#| out.width: 790
+#| out.height: 790*.75
+#| fig-cap: Offizielle Parteiposition vs. Antwort des KI-Wählers
+
+ga_3 <- reorder2d(ga, center = 0)
+ee <- elements(ga_3)
+eo <- ee |> str_subset("\\(c\\)", negate = TRUE)
+ec <- paste0(eo, "(c)")
+ei <- c(rbind(eo, ec))
+ii <- match(ei, ee)
+ii <- ii[c(3:22, 1:2)] # rotieren, für links - rechts Sortierung
+ga_4 <- ga_3[, ii]
+el <- elements(ga_4)
+col.e <- ifelse(str_detect(el, "\\(c\\)"), "#777777", "black")
+bertin(ga_4,
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xlim = c(.33, .67),
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE),
+  col.e = col.e
+)
+x0 <- seq(from = .33, to = .67, length.out = 12)
+segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
+legend("topleft",
+  legend = c("Zustimmung", "Neutral", "Ablehnung"),
+  fill = c("green", "#7F7F00", "red"), border = FALSE, bty = "n"
+)
+```
+
+
+## Wo weichen die Antworten am meisten ab?
+
+@fig-heatmap-abweichungen zeigt detailliert, wo die KI-Wähler von der offiziellen Parteiposition abweichen. Die Abstufungen sind:
+
+- [Hellblau]{style="background-color:#EEEEFF; color:#000000; padding: 0 2px;"}: Keine Abweichung. KI-Wähler und die Parteiposition stimmen überein.
+- [Blau]{style="background-color:#7677C4; color:#FFFFFF; padding: 0 2px;"}: Eine Stufe Unterschied (z. B. Zustimmung statt Neutral).
+- [Dunkelblau]{style="background-color:#01178B; color:#FFFFFF; padding: 0 2px;"}: Zwei Stufen Unterschied (z. B. Zustimmung statt Ablehnung).
+
+
+📌 **Ergebnis: Manche Parteien haben mehr Abweichungen als andere – und auch bei Thesen zeigen sich deutliche Unterschiede.**
+
+```{r}
+#| label: fig-heatmap-abweichungen
+#| echo: false
+#| fig.width: 10
+#| fig.height: 7.5
+#| out.width: 790
+#| out.height: 790*.75
+#| fig-cap: Abweichungen zwischen Parteiposition und KI-Wähler
+
+g_tmp <- ga_4
+rightpoles(g_tmp) <- ""
+m <- ratings(g_tmp, trim = NA)
+rownames(m) <- rownames(m) |> str_remove_all(" - $")
+i <- seq(1, 22, 2) # jede zweite Spalte
+gd <- ga_4[, i]
+gd[] <- 0
+gd <- setScale(gd, min = 0, max = 2)
+r <- abs(m[, i] - m[, i + 1])
+ratings(gd) <- r
+bertin(gd,
+  align = FALSE,
+  colors = c(blue_light, blue_dark),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xlim = c(.33, .67),
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE)
+)
+x0 <- seq(from = .33, to = .67, length.out = 12)
+segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
+legend("topleft", title = "Abweichung:", legend = c("Keine", "1 Stufe", "2 Stufen"), fill = c(blue_light, blue_mid, blue_dark), border = FALSE, bty = "n")
+```
+
+## Welche Parteien haben die  meisten Abweichungen?
+
+@fig-abweichungen-partei zeigt, bei welcher Partei die meisten Abweichungen auftreten. Beispielsweise weicht der KI-Wähler beim Bündnis Deutschland 15-mal von der offiziellen Linie ab, während Die Linke nur fünf Abweichungen verzeichnet.
+
+📌 **Bei einigen Parteien gibt es deutlich mehr Abweichungen als bei anderen.**
+
+```{r}
+#| label: fig-abweichungen-partei
+#| echo: false
+#| fig.width: 7
+#| fig.height: 5
+#| out.width: 700
+#| out.height: 500
+#| fig-cap: Anzahl Abweichungen pro Partei
+
+N <- 38
+lvls <- c(`2` = "2 Stufen", `1` = "1 Stufe")
+df_fehler_parteien <-
+  as.data.frame(r) |>
+  pivot_longer(cols = everything()) |>
+  filter(value > 0) |>
+  group_by(name) |>
+  count(value) |>
+  mutate(
+    value_fac = recode(value, !!!lvls) |> factor(levels = lvls),
+    n_gesamt = sum(n),
+    perc = n / N,
+    perc_gesamt = n_gesamt / N
+  )
+
+th <- theme_minimal() +
+  theme(
+    plot.title = element_text(color = "#666666", face = "bold", size = 15),
+    plot.subtitle = element_text(color = "#555555", lineheight = 1.1),
+    plot.title.position = "plot",
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 11),
+    axis.text.x = element_text(size = 11, color = "black"),
+    legend.title = element_text(size = 11, face = "plain"),
+    legend.text = element_text(size = 11),
+    axis.line.x = element_line(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    axis.ticks.x = element_line(linewidth = .25)
+  )
+
+ggplot(df_fehler_parteien, aes(x = fct_reorder(name, n_gesamt), y = perc, fill = value_fac)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  labs(x = "", y = "") +
+  geom_text(aes(label = n), size = 3, color = "white", position = position_stack(vjust = .5)) +
+  scale_fill_manual("Abweichung", values = c("1 Stufe" = blue_mid, "2 Stufen" = blue_dark)) +
+  scale_y_continuous(expand = expansion(mult = c(0, .1)), labels = scales::percent_format()) +
+  ggtitle(
+    "Anzahl Abweichungen pro Partei",
+    "Pro Partei werden Anzahl und Anteil großer und kleiner Abweichungen zwischen Parteiposition\nund KI-Wähler dargestellt\n"
+  ) +
+  th
+```
+
+
+## Welche Thesen sind besonders betroffen?
+
+@fig-abweichungen-these zeigt welche These wie häufig betroffen ist:
+
+- Die These *"Ehrenamtliche Tätigkeiten für Rente anrechnen"* führt das Feld mit 10 von 11 Abweichungen an.
+- Beim *"Tempolimit auf Autobahn einführen"* antworteten die KI-Wähler bis auf einen Fall im Sinne ihrer Parteien.
+- Nur 3 der 38 Thesen wurden in allen Fällen exakt gemäß der offiziellen Parteilinie beantwortet.
+
+📌 **Insgesamt weisen die Thesen große Unterschiede bei der Anzahl an Abweichungen auf.**
+
+```{r}
+#| label: fig-abweichungen-these
+#| echo: false
+#| fig.width: 7
+#| fig.height: 7.5
+#| out.width: 700
+#| out.height: 750
+#| fig-cap: Anzahl Abweichungen pro These
+
+lvls <- c(`0` = "keine", `2` = "2 Stufen", `1` = "1 Stufe")
+N <- 11
+df_fehler_thesen <-
+  t(r) |>
+  as.data.frame(r) |>
+  pivot_longer(cols = everything()) |>
+  group_by(name) |>
+  count(value) |>
+  mutate(
+    value_fac = recode(value, !!!lvls) |> factor(levels = lvls),
+    n_gesamt = ifelse(value %in% 1:2, n, 0) |> sum(na.rm = TRUE),
+    perc = n / N,
+    perc_gesamt = n_gesamt / N
+  )
+
+ggplot(df_fehler_thesen, aes(x = fct_reorder(name, n_gesamt), y = perc, fill = value_fac)) +
+  geom_col() +
+  coord_flip() +
+  theme_bw() +
+  labs(x = "", y = "") +
+  geom_text(aes(label = ifelse(value == 0, "", n)), size = 3, color = "white", position = position_stack(vjust = .5)) +
+  scale_fill_manual("Abweichung", values = c("keine" = "transparent", "1 Stufe" = "#7775C2", "2 Stufen" = "darkblue"), breaks = c("1 Stufe", "2 Stufen")) +
+  scale_y_continuous(expand = expansion(), labels = scales::percent_format(), limits = c(0, 1)) +
+  ggtitle(
+    "Anzahl Abweichungen pro These",
+    "Pro politischer These werden Anzahl und Anteil großer und kleiner Abweichungen zwischen\nParteiposition und KI-Wähler dargestellt\n"
+  ) +
+  th +
+  theme(
+    axis.title = element_text(size = 12, face = "bold"),
+    axis.text = element_text(size = 8.5),
+  )
+```
+
+## Offizielle Position vs. KI-Wähler im Überblick
+
+In @fig-heatmap-ordered wurden die Spalten nach Ähnlichkeit sortiert. Dabei zeigt sich unter anderem Folgendes:
+
+- Bei Die Linke, FDP oder AfD liegt der KI-Wähler (grau) direkt neben seiner Partei (schwarz)
+- Bei Freie Wähler hingegen liegt der KI-Wähler zwischen CDU/CSU und Wertunion, die Partei jedoch zwischen SPD und FDP.
+
+📌 **Nicht immer antwortet ein KI-Wähler am ähnlichsten zu seiner Partei.**
+
+```{r}
+#| label: fig-heatmap-ordered
+#| echo: false
+#| fig.width: 10
+#| fig.height: 7.5
+#| out.width: 790
+#| out.height: 790*.75
+#| fig-cap: Parteiposition und KI-Wähler nach Ähnlichkeit sortiert
+
+ga_2d <- reorder2d(ga, center = 0)
+e_ii <- c(3:22, 1:2) # Spalten rotieren, da sinnhafter
+ga_2e <- ga_2d[, e_ii]
+el <- elements(ga_2e)
+col.e <- ifelse(str_detect(el, "\\(c\\)"), "#777777", "black")
+bertin(ga_2e,
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xlim = c(.33, .67),
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE),
+  col.e = col.e
+)
+legend("topleft",
+  legend = c("Zustimmung", "Neutral", "Ablehnung"),
+  fill = c("green", "#7F7F00", "red"), border = FALSE, bty = "n"
+)
+```
+
+Der nachfolgende Biplot (ein Streudiagramm mit mehreren Achsen, siehe @fig-biplot) stellt dies grafisch dar:
+
+-   **Punkte**: repräsentieren **Parteien/KI-Wähler**. Liegen sie nah beieinander sind, weisen sie ähnliche Antwortmuster auf.
+
+-   **Achsen** sind die **politischen Thesen** und zeigen stets in Richtung *Zustimmung zur
+    These*. Durch Fällen des Lots auf eine Achse, kann man tendenziell ablesen, ob die Partei/KI-Wähler eher zustimmend oder ablehnend ist.
+
+*Beispiel*: Die AfD sowie CDU/CSU haben auf der Achse (These) "*Kernenergie zur Stromerzeugung nutzen*" einen hohen Wert, d.h. sie stimmen der These zu. SPD und Grüne haben auf der Achse einen niedrigen Wert, d.h. sie stimmen der These nicht zu. *Hinweis*: Bitte beachten Sie, dass die 2D-Darstellung die Position der Parteien auf den Achsen/Thesen nicht 100% genau abbildet.
+
+Auch hier zeigt sich noch einmal grafisch, was wir bereits oben beobachtet haben:
+
+📌 **Insgesamt liegen die KI-Wähler recht nah an ihren Parteien. Bei Freie Wähler und Wertunion gibt es sichtbare Abweichungen.**
+
+```{r}
+#| label: fig-biplot
+#| echo: false
+#| fig.width: 9
+#| fig.height: 5.5
+#| out.width: 790
+#| out.height: 790*(5.5/9)
+#| fig-cap: Übersicht von Parteiposition und Antworten der KI-Wähler
+
+ga2 <- ga
+e <- elements(ga2)
+elements(ga2) <- e |>
+  str_replace_all("CDU / CSU", "CDU") |>
+  str_replace_all("Freie Wähler", "FreieW") |>
+  str_replace_all("Bündnis Deutschland", "BünDeu") |>
+  str_replace_all("WerteUnion", "WerteU") |>
+  str_replace_all("Die Linke", "Linke") |>
+  str_replace_all("Die Grünen", "Grüne")
+
+rightpoles(ga2) <- paste("↑", rightpoles(ga2))
+leftpoles(ga2) <- NA
+set.seed(0)
+biplot2d(ga2,
+  center = 0,
+  mai = c(1, 2.85, 1, 2.85),
+  c.label.col = "blue",
+  e.point.col = rep_len(c("black", "#777777"), ncol(ga2)),
+  e.label.col = rep_len(c("black", "#777777"), ncol(ga2))
+)
+```
+
+
+## Bleiben die Antworten des KI-Wählers konstant?
+
+Dazu wurden für die SPD und das Bündnis Deutschland **jeweils 20 KI-Wähler** 🤖🤖🤖 befragt.  @fig-heatmap-spd zeigt die Antworten der KI-Wähler (grau) der SPD im Vergleich zur Parteiposition (letzte Spalte, schwarz).
+
+Während viele Antworten stabil blieben – etwa die durchgehende Unterstützung für ein *"Tempolimit auf Autobahnen"* – zeigten anderen Thesen deutliche Schwankungen. Auffällig ist die Bandbreite an Antworten bei  *"Beratungspflicht zu Schwangerschaftsabbruch"*: Hier decken die KI-Wähler alle drei Antwortoptionen ab – von Zustimmung über Neutralität bis hin zur Ablehnung. 
+
+⚡ Auffällig ist, dass es diverse Thesen gibt, bei denen die KI-Wähler systematisch von der offiziellen Parteilinie abweichen. Ein Beispiel ist die These *"Soziales Pflichtjahr für Jugendliche einführen"*: Während die Partei diese ablehnt, schwanken die KI-Wähler zwischen Zustimmung und Neutralität.
+
+```{r}
+#| label: fig-heatmap-spd
+#| echo: false
+#| fig.width: 10
+#| fig.height: 7.5
+#| out.width: 790
+#| out.height: 790*.75
+#| fig-cap: Antworten von 20 KI-Wählern der SPD vs. offizielle Parteiposition
+
+g <- importExcel(grid_file_spd)
+leftpoles(g) <- rightpoles(g)
+g <- cbind(ga[, 1], g)
+ga_2d <- reorder2d(g, center = 0)
+ga_2d <- ga_2d[, ncol(ga_2d):1]
+el <- elements(ga_2d)
+col.e <- ifelse(str_detect(el, "\\(c_[0-9]+\\)"), "#777777", "black")
+bertin(ga_2d,
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xlim = c(.33, .67),
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE),
+  col.e = col.e
+)
+x0 <- seq(from = .33, to = .67, length.out = 22)[21:22]
+segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
+legend("topleft",
+  legend = c("Zustimmung", "Neutral", "Ablehnung"),
+  fill = c("green", "#7F7F00", "red"), border = FALSE, bty = "n"
+)
+```
+
+@fig-buendnis zeigt die Ergebnisse für das Bündnis Deutschland. Die Antworten der KI-Wähler schwanken insgesamt stärker als bei der SPD. Besonders bemerkenswert ist die Reaktion auf die These *Arbeitserlaubnis für Asylsuchende sofort*: Während die offizielle Parteiposition eine Zustimmung vorsieht, lehnten die KI-Wähler diese These konsistent ab – ⚡ ein deutlicher Widerspruch zur programmatischen Linie der Partei.
+
+```{r}
+#| label: fig-buendnis
+#| echo: false
+#| fig.width: 10
+#| fig.height: 7.5
+#| out.width: 790
+#| out.height: 790*.75
+#| fig-cap: Antworten von 20 KI-Wählern des Bündnis Deutschland vs. offizielle Parteiposition
+
+g <- importExcel(grid_file_buendnis)
+leftpoles(g) <- rightpoles(g)
+g <- cbind(ga[, 17], g)
+ga_2d <- reorder2d(g, center = 0)
+el <- elements(ga_2d)
+col.e <- ifelse(str_detect(el, "\\(c_[0-9]+\\)"), "#777777", "black")
+bertin(ga_2d,
+  align = FALSE,
+  colors = c("red", "green"),
+  showvalues = FALSE,
+  cex.elements = .75,
+  xlim = c(.33, .67),
+  ylim = c(0, .8),
+  id = c(TRUE, FALSE),
+  col.e = col.e
+)
+x0 <- seq(from = .33, to = .67, length.out = 22)[21:22]
+segments(x0 = x0, y0 = 0, x1 = x0, y1 = .8, lwd = 2)
+legend("topleft",
+  legend = c("Zustimmung", "Neutral", "Ablehnung"),
+  fill = c("green", "#7F7F00", "red"), border = FALSE, bty = "n"
+)
+```
+
+Abschließend werden die 20 KI-Wähler der SPD und des Bündnis Deutschland als Biplot dargestellt. Hier zeigt sich die systematische Abweichungen von der Partei bei einigen These sehr deutlich. Denn die Parteiposition liegt nicht im Zentrum ihrer KI-Wähler. Besonders bei der SPD ist die Lage der Partei deutlich von den KI-Wählern abgegrenzt.
+
+```{r}
+#| label: fig-biplot-spd
+#| echo: false
+#| fig.width: 10
+#| fig.height: 5.5
+#| out.width: 790
+#| out.height: 790*5.5/10
+#| fig-cap: Übersicht von Parteiposition sowie Antworten von 20 KI-Wählern der SPD
+
+parteien_auswahl <- c("SPD", "CDU/CSU", "GRÜNE", "FDP", "AfD", "Die Linke", "Freie Wähler", "Volt", "Bündnis Deutschland", "WerteUnion", "BSW")
+parteien_chatgpt <- glue("{parteien_auswahl}(c)")
+parteien_auswahl <- c(parteien_auswahl, parteien_chatgpt)
+
+g <- importExcel(grid_file)
+g_spd <- importExcel(grid_file_spd)
+g_buendnis <- importExcel(grid_file_buendnis)
+
+g_orig <- g[, parteien_auswahl]
+leftpoles(g_orig) <- ""
+leftpoles(g_spd) <- ""
+leftpoles(g_buendnis) <- ""
+
+gg <- cbind(g_orig, g_spd, g_buendnis)
+rightpoles(gg) <- paste("↑", rightpoles(gg))
+
+set.seed(4)
+el <- elements(gg)
+ii_c <- str_detect(el, "\\(c\\)")
+ii_spd <- str_detect(el, "spd\\(c_[0-9]+\\)")
+ii_bd <- str_detect(el, "bundnis_deutschland\\(c_[0-9]+\\)")
+
+e.label.col <- rep_len("black", ncol(gg))
+e.label.col[el == "SPD"] <- "#D32D23"
+e.label.col[el == "Bündnis Deutschland"] <- "#C2265F"
+e.label.col[ii_c | ii_spd | ii_bd] <- "transparent"
+
+e.point.col <- rep_len("black", ncol(gg))
+e.point.col[ii_c] <- "transparent"
+e.point.col[el == "SPD"] <- "#D32D23"
+e.point.col[ii_spd] <- "#FFAAAA"
+e.point.col[el == "Bündnis Deutschland"] <- "#C2265F"
+e.point.col[ii_bd] <- "#F58AB0"
+
+biplot2d(gg,
+  col.active = which(!ii_spd & !ii_bd),
+  var.show = FALSE,
+  center = 0,
+  mai = c(1, 2.85, 1, 2.85),
+  c.label.col = "blue",
+  e.label.col = e.label.col,
+  e.point.col = e.point.col
+)
+```
+
+## Fazit
+
+1️⃣ Die KI-Wähler sind ihrer eigenen Partei tendenziell ähnlicher als anderen Parteien, zumindest im Gesamtbild.
+
+2️⃣ Wie bei echten Parteianhängern variieren die Antworten von KI-Wählern. Manche Thesen zeigen hierbei eine sehr große Variation in den Antworten, während andere eher konstant bleiben. 
+
+3️⃣ Aufällig ist, dass die Antworten der KI-Wähler bei einigen Thesen systematisch von den offiziellen Parteipositionen abweichen. Unsere KI-Wähler scheinen einen Bias zu haben.
+
+**Was lernen wir nun daraus? Kann man ChatGPT z.B. nutzen, um einen Wähler zu simulieren?**
+
+💡 Dies lässt sich ohne Vergleichsdaten echter Wähler nicht beantworten.
+Echte Antworten würden vermutlich deutlich stärker variieren. Echte Menschen - auch Wähler derselben Partei - sind vielschichtig in ihrer Haltung. So stellen viele Nutzer des Wahl-O-Mat fest, dass die Übereinstimmung mit ihrer bevorzugten Partei selten 100 % beträgt. 
+
+💡 Kritisch ist besonders die Existenz eines Bias. Wie kommt dieser zustande? Will man einen KI-Wähler Ansatz gewinnbringend nutzen, gibt es viele Fragen zu klären: Lassen sich die systematischen Abweichungen bei den Thesen auch bei echten Wählern finden? Kann man den Ansatz z.B. mit gezielterem Prompting (z.B. inkl. Geschlecht, Alter etc.) oder Modellanpassungen verbessern? Ich bin gespannt was die Wissenschaft hierzu herausfinden und wie sie einen solchen Ansatz nutzbar machen wird.
+
+
+## Anhang 
+
+### Daten und Methodik
+
+Es wurde der [Wahl-O-Mat-Datensatz](https://www.bpb.de/themen/wahl-o-mat/bundestagswahl-2025/558463/download/) der Bundeszentrale für Politische Bildung (BPB) genutzt.
+
+Die Daten und Grafiken wurden in der [R Software](https://www.r-project.org/) aufbereitet. Die Heatmaps und
+Biplots wurden mit dem R Paket [OpenRepGrid](https://joss.theoj.org/papers/10.21105/joss.06918#) (Heckmann, 2024) erzeugt. Die Zustimmung zu einer These wurde mit `1`, Neutralität mit `0` und Ablehnung mit `-1`
+codiert. Bei der Analyse wurde die Möglichkeit Thesen doppelt zu gewichten oder zu überspringen nicht berücksichtigt.
+
+In den Heatmaps wurden die Zeilen und Spalten (z.B. @fig-heatmap-ordered) nach den Ladungen der Parteien bzw. Thesen auf den ersten beiden Hauptkomponenten im Uhrzeigersinn sortiert. So entsteht eine Anordnung der Spalten (Parteien) und Zeilen (Thesen) nach Ähnlichkeit, die zugleich der Anordnung im Biplot entspricht. Eine Übersicht zu Sortierungsmethoden (Seriation) für 2D-Matrizen findet man bei Hahsler (2017).
+
+##### Der ChatGPT Prompt {#sec-prompt}
+
+ChatGPT (Modell GPT-4o) hat pro KI-Wähler folgenden Prompt erhalten. Der Platzhalter `<PARTEI>` wurde vorher
+durch den Namen der Partei ersetzt.
+
+::: {style="font-size: 80%;"}
+```{r}
+#| label: prompt
+#| echo: false
+#| results: asis
+
+p <- read_lines("data/prompt.txt")
+p <- p |> str_replace_all("<PARTEI>", "\\\\<PARTEI\\\\>")
+p <- paste("> ", p)
+prompt <- glue_collapse(p, sep = "\n")
+cat(prompt)
+```
+:::
+
+### Die Parteipositionen {#sec-faq}
+
+In den FAQ des Wahl-O-Mat wird unter dem Punkt *Wer hat die Thesen beantwortet?* ausgeführt, dass die Parteien selber auf die Thesen geantwortet haben. Deshalb in diesem Beitrag von einer *offiziellen* Parteiposition gesprochen. Es folgt der Auszug aus den FAQ.
+
+> Die Positionen und Begründungen der Parteien zu den Thesen im Wahl-O-Mat stammen ausschließlich von den Parteien selbst. Sie werden von der Wahl-O-Mat-Redaktion nicht interpretiert oder geändert.
+>
+> Die Wahl-O-Mat-Thesen werden zur Beantwortung an die Vorstände oder Geschäftsführungen der Parteien geschickt. Diese legen eigenverantwortlich fest, wer für die Partei die Thesen beantwortet. Die Parteien hatten etwa zwei Wochen Zeit, alle Thesen zu beantworten. Sie wurden gebeten, die Thesen entsprechend der Parteihaltung mit „stimme zu“, „stimme nicht zu“ oder „neutral“ zu beantworten. Außerdem konnten sie zu jeder These eine Begründung abgeben, in der sie ihre jeweilige Position ausführen und ihren genauen Standpunkt zur These konkretisieren können.
+>
+> Die Thesen werden ausschließlich von den Parteien beantwortet. Bei Unstimmigkeiten zwischen Position und Begründung einer Partei oder möglichen Fehlern wird diese darauf hingewiesen, doch können nur die Parteien selbst entscheiden, ob ihre Einträge geändert werden.
+>
+> Somit können die Nutzerinnen und Nutzer im Wahl-O-Mat ihre eigenen Positionen mit den tatsächlichen und autorisierten Positionen der Parteien vergleichen.
+
+
+### Die politischen Thesen {#sec-thesen}
+
+Die im Wahl-O-Mat verwendeten Thesen sind in der nachfolgenden Tabelle aufgelistet. Zur schnelleren
+Auffindbarkeit ist die Tabelle alphabetisch nach der in den Grafiken genutzten Thesen-Kurzform (von uns
+erstellt) geordnet.
+
+::: {style="font-size: 90%;"}
+```{r tabelle-thesen, echo=FALSE}
+#| label: tbl-thesen
+#| echo: false
+#| tbl-cap: Die 38 Wahl-O-Mat Thesen
+
+df <- read_excel(file_in)
+df <- df |> mutate(these_kurzform_cleaned = str_remove_all(these_kurzform, "„"))
+thesen_ordered <- stri_sort(df$these_kurzform_cleaned, locale = "de_DE")
+de_order <- match(df$these_kurzform_cleaned, thesen_ordered)
+df |>
+  select(c(Kurzform = these_kurzform, These = these_these)) |>
+  arrange(de_order) |>
+  knitr::kable()
+```
+:::
+
+## Literatur
+
+Hahsler, M. (2017). An experimental comparison of seriation methods for one-mode two-way data. *European
+Journal of Operational Research*, 257, 133--143. <https://doi.org/10.1016/j.ejor.2016.08.066>
+
+Heckmann, M. (2024). OpenRepGrid: An R Package for the Analysis of Repertory Grid Data. *Journal of Open
+Source Software*, 9(104), 6918, <https://doi.org/10.21105/joss.06918>
+
+<img src="http://vg03.met.vgwort.de/na/32933e775beb4a2cad1b9f3ab558aa5e" width="1" height="1" alt="">

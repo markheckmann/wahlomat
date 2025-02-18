@@ -95,9 +95,9 @@ geordnet.
 | Beratungspflicht vor Schwangerschaftsabbruch | Schwangerschaftsabbrüche sollen in den ersten drei Monaten weiterhin nur nach Beratung straffrei sein. |
 | Bürgergeld bei Ablehnung Stellenangebot streichen | Das Bürgergeld soll denjenigen gestrichen werden, die wiederholt Stellenangebote ablehnen. |
 | Doppelstaatsbürgerschaft weiterhin ermöglichen | In Deutschland soll es weiterhin generell möglich sein, neben der deutschen eine zweite Staatsbürgerschaft zu haben. |
-| Ehrenamtliche Tätigkeiten für Rente anrechnen | Ehrenamtliche Tätigkeiten sollen auf die zukünftige Rente angerechnet werden. |
+| Ehrenamtliche Tätigkeiten auf Rente anrechnen | Ehrenamtliche Tätigkeiten sollen auf die zukünftige Rente angerechnet werden. |
 | Erneuerbare Energien finanziell fördern | Der Ausbau erneuerbarer Energien soll weiterhin vom Staat finanziell gefördert werden. |
-| EU-Zölle auf E-Autos abschaffen | Deutschland soll sich für die Abschaffung der erhöhten EU-Zölle auf chinesische Elektroautos einsetzen. |
+| EU-Zölle auf chinesische E-Autos abschaffen | Deutschland soll sich für die Abschaffung der erhöhten EU-Zölle auf chinesische Elektroautos einsetzen. |
 | Euro durch nationale Währung ersetzen | Der Euro soll in Deutschland durch eine nationale Währung ersetzt werden. |
 | Fachkräfteanwerbung aus Ausland fördern | Deutschland soll weiterhin die Anwerbung von Fachkräften aus dem Ausland fördern. |
 | Fossile Heizungen weiterhin erlauben | Neue Heizungen sollen auch zukünftig vollständig mit fossilen Brennstoffen (z. B. Gas oder Öl) betrieben werden dürfen. |
@@ -113,14 +113,14 @@ geordnet.
 | Mindestlohn auf 15 Euro erhöhen | Der gesetzliche Mindestlohn soll spätestens 2026 auf 15 Euro erhöht werden. |
 | Ökologische Landwirtschaft stärker fördern | Ökologische Landwirtschaft soll stärker gefördert werden als konventionelle Landwirtschaft. |
 | Rechtsextremismus-Projekte verstärkt fördern | Der Bund soll Projekte gegen Rechtsextremismus verstärkt fördern. |
-| Rentenabschläge nach 40 Jahren abschaffen | Alle Beschäftigten sollen bereits nach 40 Beitragsjahren ohne Abschläge in Rente gehen können. |
+| Rente nach 40 Beitragsjahren abschlagsfrei | Alle Beschäftigten sollen bereits nach 40 Beitragsjahren ohne Abschläge in Rente gehen können. |
 | Rüstungsexporte nach Israel erlauben | Aus Deutschland sollen weiterhin Rüstungsgüter nach Israel exportiert werden dürfen. |
 | Schienenverkehr vor Straßenverkehr priorisieren | Beim Ausbau der Verkehrsinfrastruktur soll die Schiene Vorrang vor der Straße haben. |
 | Schuldenbremse im Grundgesetz beibehalten | Die Schuldenbremse im Grundgesetz soll beibehalten werden. |
 | Schulpolitik-Befugnisse für Bund stärken | Der Bund soll mehr Kompetenzen in der Schulpolitik erhalten. |
-| Soziales Pflichtjahr für Jugendliche einführen | Für junge Erwachsene soll ein soziales Pflichtjahr eingeführt werden. |
+| Soziales Pflichtjahr für junge Erwachsene | Für junge Erwachsene soll ein soziales Pflichtjahr eingeführt werden. |
 | Spitzensteuersatz anheben | Bei der Besteuerung von Einkommen soll der Spitzensteuersatz angehoben werden. |
-| Strafbarkeit ab 14 einführen | Unter 14-Jährige sollen strafrechtlich belangt werden können. |
+| Strafbarkeit unter 14 einführen | Unter 14-Jährige sollen strafrechtlich belangt werden können. |
 | Streikrecht in kritischen Bereichen einschränken | Das Streikrecht für Beschäftigte in Unternehmen der kritischen Infrastruktur soll gesetzlich eingeschränkt werden. |
 | Stromkosten-Ausgleich für Unternehmen | Energieintensive Unternehmen sollen vom Staat einen finanziellen Ausgleich für ihre Stromkosten erhalten. |
 | Tempolimit auf Autobahnen einführen | Auf allen Autobahnen soll ein generelles Tempolimit gelten. |

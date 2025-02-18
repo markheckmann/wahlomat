@@ -16,16 +16,17 @@ library(openxlsx)
 library(flextable)
 library(OpenRepGrid)
 
-file_in <- "data/wide_format.xlsx"
-grid_file <- "data/grid.xlsx"
+stopifnot(packageVersion("OpenRepGrid") >= "0.1.16") # >= 0.1.17.9002 oder höher benötigt
+
+file_in <- "data/alle_parteien_wide_v1.xlsx"
+grid_file <- "data/grid/alle_parteien_offiziell_v1.xlsx"
 ```
 
 ```{r echo=FALSE}
 g <- importExcel(grid_file)
 leftpoles(g) <- rightpoles(g)
-# rightpoles(g) <- paste("↑", thesen)
-# leftpoles(g) <- paste(thesen, "↓")
-parteien_auswahl <- c(1, 2, 3, 4, 5, 6, 8, 14, 25, 28, 26)
+parteien_auswahl <- c('SPD', 'CDU/CSU', 'GRÜNE', 'FDP', 'AfD', 'Die Linke', 'Freie Wähler',
+                      'Volt', 'Bündnis Deutschland', 'WerteUnion', 'BSW')
 ga <- g[, parteien_auswahl]
 ```
 
